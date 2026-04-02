@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Events | The Urban Collective</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <img src="logo.PNG" alt="The Urban Collective" class="nav-logo-img" />
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="cart-services.html">Cart Services</a></li>
+      <li><a href="book.html">Book With Us!</a></li>
+      <li><a href="events.html" class="active">Events</a></li>
+    </ul>
+    <button class="nav-search" aria-label="Search">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+    </button>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <div class="ev-header">
+    <h1>Upcoming Events</h1>
+    <p>Community Room — all are welcome.</p>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div class="ev-filters">
+    <button class="ev-filter-btn ev-filter-active" data-filter="all">All</button>
+    <button class="ev-filter-btn" data-filter="music">Music</button>
+    <button class="ev-filter-btn" data-filter="community">Community</button>
+    <button class="ev-filter-btn" data-filter="arts">Arts</button>
+    <button class="ev-filter-btn" data-filter="wellness">Wellness</button>
+  </div>
+
+  <!-- EVENTS GRID -->
+  <div class="ev-grid" id="evGrid">
+
+    <div class="ev-card" data-category="community">
+      <div class="ev-flyer" style="background: linear-gradient(160deg, #2d2d2d 0%, #5a4a3a 100%);">
+        <span class="ev-flyer-placeholder">Community</span>
+      </div>
+      <div class="ev-card-info">
+        <span class="ev-card-tag">Community</span>
+        <h3 class="ev-card-name">Sweet Mondays Brunch</h3>
+        <p class="ev-card-date">Friday, April 10 · 10am – 2pm</p>
+      </div>
+    </div>
+
+    <div class="ev-card" data-category="music">
+      <div class="ev-flyer" style="background: linear-gradient(160deg, #1a1a2e 0%, #4a3060 100%);">
+        <span class="ev-flyer-placeholder">Music</span>
+      </div>
+      <div class="ev-card-info">
+        <span class="ev-card-tag">Music</span>
+        <h3 class="ev-card-name">Matcha & Music Night</h3>
+        <p class="ev-card-date">Sunday, May 3 · 6pm – 10pm</p>
+      </div>
+    </div>
+
+    <div class="ev-card" data-category="arts">
+      <div class="ev-flyer" style="background: linear-gradient(160deg, #1e3a2f 0%, #2d6a4f 100%);">
+        <span class="ev-flyer-placeholder">Arts</span>
+      </div>
+      <div class="ev-card-info">
+        <span class="ev-card-tag">Arts</span>
+        <h3 class="ev-card-name">Spring Market Pop-Up</h3>
+        <p class="ev-card-date">Saturday, April 18 · Doors open 10am</p>
+      </div>
+    </div>
+
+    <div class="ev-card" data-category="wellness">
+      <div class="ev-flyer" style="background: linear-gradient(160deg, #2e1a1a 0%, #7a3b3b 100%);">
+        <span class="ev-flyer-placeholder">Wellness</span>
+      </div>
+      <div class="ev-card-info">
+        <span class="ev-card-tag">Wellness</span>
+        <h3 class="ev-card-name">Morning Flow & Matcha</h3>
+        <p class="ev-card-date">Saturday, May 10 · 8am – 10am</p>
+      </div>
+    </div>
+
+    <div class="ev-card" data-category="community">
+      <div class="ev-flyer" style="background: linear-gradient(160deg, #1a2a3a 0%, #2a4a6a 100%);">
+        <span class="ev-flyer-placeholder">Community</span>
+      </div>
+      <div class="ev-card-info">
+        <span class="ev-card-tag">Community</span>
+        <h3 class="ev-card-name">Vendor Night</h3>
+        <p class="ev-card-date">Friday, May 22 · 5pm – 9pm</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <span class="footer-brand">The Urban Collective</span>
+      <div class="footer-icons">
+        <a href="mailto:" class="footer-icon footer-icon-email" aria-label="Email">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+            <rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/>
+          </svg>
+        </a>
+        <a href="#" class="footer-icon footer-icon-insta" aria-label="Instagram">
+          <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+    <div class="footer-copy">© 2026</div>
+  </footer>
+
+  <script>
+    const btns = document.querySelectorAll('.ev-filter-btn');
+    const cards = document.querySelectorAll('.ev-card');
+
+    btns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        btns.forEach(b => b.classList.remove('ev-filter-active'));
+        btn.classList.add('ev-filter-active');
+
+        const filter = btn.dataset.filter;
+        cards.forEach(card => {
+          card.style.display = (filter === 'all' || card.dataset.category === filter) ? '' : 'none';
+        });
+      });
+    });
+  </script>
+
+</body>
+</html>
