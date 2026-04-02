@@ -11,9 +11,6 @@
 
   <!-- NAV -->
   <nav>
-    <a href="index.html" class="nav-logo">
-      <img src="logo.PNG" alt="The Urban Collective" class="nav-logo-img" />
-    </a>
     <ul class="nav-links">
       <li><a href="index.html">Home</a></li>
       <li><a href="about.html">About</a></li>
@@ -26,6 +23,9 @@
         <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
       </svg>
     </button>
+    <a href="index.html" class="nav-logo">
+      <img src="logo.PNG" alt="The Urban Collective" class="nav-logo-img" />
+    </a>
   </nav>
 
   <!-- PAGE -->
@@ -161,17 +161,15 @@
     };
 
     const CATERING_OPTIONS = [
-      { id: 'none',   label: 'No catering needed',    sub: 'Space rental only',                                    popular: false },
-      { id: 'matcha', label: 'Matcha Cart',            sub: 'Full-service ceremonial matcha bar, staffed barista',  popular: false },
-      { id: 'coffee', label: 'Coffee Cart',            sub: 'Espresso, cold brew, cappuccinos, staffed barista',    popular: false },
-      { id: 'both',   label: 'Matcha + Coffee Cart',  sub: 'Both carts, two baristas',                             popular: true  },
+      { id: 'offsite',      label: 'Off-Site Mobile Cart',         sub: 'We bring the cart to your venue',              popular: false },
+      { id: 'studio_cafe',  label: 'In Studio with Café Cart',     sub: 'Studio rental with full café cart service',    popular: true  },
+      { id: 'studio_only',  label: 'In Studio without Café Cart',  sub: 'Studio rental, no café service',               popular: false },
     ];
 
     const CATERING_LABELS = {
-      none:   'No catering',
-      matcha: 'Matcha Cart',
-      coffee: 'Coffee Cart',
-      both:   'Matcha + Coffee Cart',
+      offsite:     'Off-Site Mobile Cart',
+      studio_cafe: 'In Studio with Café Cart',
+      studio_only: 'In Studio without Café Cart',
     };
 
     const EVENT_TYPES = [
@@ -338,7 +336,7 @@
 
     function openModal(key, day, availableSlots) {
       selectedSlot     = null;
-      selectedCatering = 'none';
+      selectedCatering = 'offsite';
 
       const [y, m] = key.split('-');
       const title  = `${MONTH_NAMES[parseInt(m, 10) - 1]} ${day}, ${y}`;
@@ -367,9 +365,16 @@
         });
       });
 
-      // Default: "No catering needed" pre-selected
-      const nocat = document.querySelector('.bk-catering-card[data-catering="none"]');
-      if (nocat) nocat.classList.add('bk-catering-selected');
+      // Default: first catering option pre-selected
+      const firstCat = document.querySelector('.bk-catering-card');
+      if (firstCat) firstCat.classList.add('bk-catering-selected');
+
+      // "Other" event type reveals a description textarea
+      const etypeSelect = document.getElementById('etype');
+      const otherWrap   = document.getElementById('otherEventWrap');
+      etypeSelect.addEventListener('change', () => {
+        otherWrap.hidden = etypeSelect.value !== 'Other';
+      });
 
       // Form submit
       document.getElementById('bookingForm').addEventListener('submit', handleSubmit);
@@ -443,6 +448,13 @@
                 <option value="">Select event type…</option>
                 ${typeOptions}
               </select>
+            </div>
+          </div>
+
+          <div id="otherEventWrap" hidden>
+            <div class="bk-field">
+              <label class="bk-label" for="otherEvent">Tell us about your event</label>
+              <textarea class="bk-input bk-textarea" id="otherEvent" name="otherEvent" placeholder="Briefly describe what you have in mind…"></textarea>
             </div>
           </div>
 
