@@ -113,14 +113,21 @@ nav {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 520px;
   overflow: hidden;
   position: relative;
 }
 
 .hero-inner {
   text-align: center;
-  padding: 60px 40px;
+  padding: 12px 40px;
+}
+
+.hero-logo {
+  max-width: min(680px, 85vw);
+  width: 100%;
+  height: auto;
+  display: block;
+  margin: 0 auto;
 }
 
 .hero-the {
