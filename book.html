@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book With Us | The Urban Collective</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="index.html" class="nav-logo">
+      <img src="logo.PNG" alt="The Urban Collective" class="nav-logo-img" />
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="cart-services.html">Cart Services</a></li>
+      <li><a href="book.html" class="active">Book With Us!</a></li>
+      <li><a href="#">More</a></li>
+    </ul>
+    <button class="nav-search" aria-label="Search">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+    </button>
+  </nav>
+
+  <!-- PAGE -->
+  <div class="bk-page">
+
+    <div class="bk-header">
+      <h1>Book With Us</h1>
+      <p>Reserve the studio, café, or event space for your next gathering. Click an available date to get started.</p>
+    </div>
+
+    <!-- LEGEND -->
+    <div class="bk-legend">
+      <span class="bk-legend-item">
+        <span class="bk-legend-dot bk-dot-available"></span>Available
+      </span>
+      <span class="bk-legend-item">
+        <span class="bk-legend-dot bk-dot-partial"></span>Some slots open
+      </span>
+      <span class="bk-legend-item">
+        <span class="bk-legend-dot bk-dot-private"></span>Private event
+      </span>
+      <span class="bk-legend-item">
+        <span class="bk-legend-dot bk-dot-owner"></span>Our events
+      </span>
+    </div>
+
+    <!-- CALENDAR -->
+    <div class="bk-calendar-wrap">
+      <div class="bk-cal-nav">
+        <button class="bk-nav-btn" id="prevMonth" aria-label="Previous month">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <span class="bk-month-label" id="monthLabel"></span>
+        <button class="bk-nav-btn" id="nextMonth" aria-label="Next month">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+      <div class="bk-cal-grid" id="calGrid"></div>
+    </div>
+
+  </div>
+
+  <!-- MODAL OVERLAY -->
+  <div class="bk-overlay" id="overlay" aria-hidden="true">
+    <div class="bk-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <button class="bk-modal-close" id="modalClose" aria-label="Close">✕</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <span class="footer-brand">The Urban Collective</span>
+      <div class="footer-icons">
+        <a href="mailto:" class="footer-icon footer-icon-email" aria-label="Email">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+            <rect x="2" y="4" width="20" height="16" rx="2"/><polyline points="2,4 12,13 22,4"/>
+          </svg>
+        </a>
+        <a href="#" class="footer-icon footer-icon-insta" aria-label="Instagram">
+          <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+    <div class="footer-copy">© 2026</div>
+  </footer>
+
+  <script>
+    // ─────────────────────────────────────────────
+    // DATA — Edit these to manage your calendar
+    // ─────────────────────────────────────────────
+
+    // YOUR events: full details shown publicly on the calendar.
+    // Add a 'flyer' path (e.g. 'images/flyer-brunch.jpg') once you have the image files.
+    // Leave flyer as null to show a styled placeholder instead.
+    const OWNER_EVENTS = {
+      '2026-04-10': {
+        name:    'Sweet Mondays Brunch',
+        tag:     'Community Event',
+        date:    'Friday, April 10 · 10am – 2pm',
+        location:'The Urban Collective Studio',
+        detail:  'Community event · Open to all',
+        desc:    'Join us for a laid-back brunch with Sweet Mondays handcrafted matcha and coffee. Open seating, good music, and great company. All are welcome — come as you are.',
+        flyer:   null,
+      },
+      '2026-04-18': {
+        name:    'Spring Market Pop-Up',
+        tag:     'Vendor Market',
+        date:    'Saturday, April 18 · Doors open 10am',
+        location:'The Urban Collective Studio',
+        detail:  'Vendor market · Doors open 10am',
+        desc:    'Shop local vendors, enjoy Sweet Mondays drinks, and connect with the community. From handmade goods to small-batch products — a curated market experience in the heart of the studio.',
+        flyer:   null,
+      },
+      '2026-05-03': {
+        name:    'Matcha & Music Night',
+        tag:     'Live Event',
+        date:    'Sunday, May 3 · 6pm – 10pm',
+        location:'The Urban Collective Studio',
+        detail:  'Live set · Open to all',
+        desc:    'An evening of live music and ceremonial grade matcha. Kick back in the lounge, sip something special, and enjoy local artists in an intimate setting. 21+ welcome.',
+        flyer:   null,
+      },
+    };
+
+    // CLIENT bookings: only "Private event" is ever shown — no details exposed
+    // Slots: 'morning' (8am–12pm), 'afternoon' (12–5pm), 'evening' (5–10pm), 'full_day' (8am–10pm)
+    const CLIENT_BOOKINGS = {
+      '2026-04-04': ['morning'],
+      '2026-04-07': ['morning', 'afternoon'],
+      '2026-04-14': ['full_day'],
+      '2026-04-17': ['evening'],
+      '2026-04-23': ['morning', 'afternoon', 'evening'],
+      '2026-04-28': ['afternoon'],
+      '2026-05-06': ['morning', 'evening'],
+      '2026-05-12': ['full_day'],
+    };
+
+    // ─────────────────────────────────────────────
+    // CONSTANTS
+    // ─────────────────────────────────────────────
+
+    const ALL_SLOTS = ['morning', 'afternoon', 'evening', 'full_day'];
+
+    const SLOT_INFO = {
+      morning:   { label: 'Morning',   time: '8am – 12pm' },
+      afternoon: { label: 'Afternoon', time: '12pm – 5pm' },
+      evening:   { label: 'Evening',   time: '5pm – 10pm' },
+      full_day:  { label: 'Full Day',  time: '8am – 10pm' },
+    };
+
+    const CATERING_OPTIONS = [
+      { id: 'none',   label: 'No catering needed',    sub: 'Space rental only',                                    popular: false },
+      { id: 'matcha', label: 'Matcha Cart',            sub: 'Full-service ceremonial matcha bar, staffed barista',  popular: false },
+      { id: 'coffee', label: 'Coffee Cart',            sub: 'Espresso, cold brew, cappuccinos, staffed barista',    popular: false },
+      { id: 'both',   label: 'Matcha + Coffee Cart',  sub: 'Both carts, two baristas',                             popular: true  },
+    ];
+
+    const CATERING_LABELS = {
+      none:   'No catering',
+      matcha: 'Matcha Cart',
+      coffee: 'Coffee Cart',
+      both:   'Matcha + Coffee Cart',
+    };
+
+    const EVENT_TYPES = [
+      'Birthday Party',
+      'Corporate Event',
+      'Brand Activation / Pop-Up',
+      'Content Shoot / Photo Shoot',
+      'Wellness Event (Pilates, Yoga, etc.)',
+      'Bridal / Baby Shower',
+      'Community Gathering',
+      'Workshop / Class',
+      'Other',
+    ];
+
+    const MONTH_NAMES = [
+      'January','February','March','April','May','June',
+      'July','August','September','October','November','December'
+    ];
+    const DAY_NAMES = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+    // ─────────────────────────────────────────────
+    // HELPERS
+    // ─────────────────────────────────────────────
+
+    function pad(n) { return String(n).padStart(2, '0'); }
+    function toKey(y, m, d) { return `${y}-${pad(m + 1)}-${pad(d)}`; }
+
+    // Returns which slots are still bookable on a given day
+    function getAvailableSlots(key) {
+      const booked = CLIENT_BOOKINGS[key] || [];
+      if (booked.includes('full_day')) return [];
+      const individual = ['morning', 'afternoon', 'evening'];
+      const available = individual.filter(s => !booked.includes(s));
+      // full_day only available if nothing is booked yet
+      if (booked.length === 0) available.push('full_day');
+      return available;
+    }
+
+    // ─────────────────────────────────────────────
+    // CALENDAR
+    // ─────────────────────────────────────────────
+
+    const TODAY = new Date();
+    TODAY.setHours(0, 0, 0, 0);
+
+    let viewYear  = TODAY.getFullYear();
+    let viewMonth = TODAY.getMonth();
+
+    function renderCalendar() {
+      document.getElementById('monthLabel').textContent =
+        `${MONTH_NAMES[viewMonth]} ${viewYear}`;
+
+      const grid = document.getElementById('calGrid');
+      grid.innerHTML = '';
+
+      // Day-of-week headers
+      DAY_NAMES.forEach(d => {
+        const h = document.createElement('div');
+        h.className = 'bk-cal-day-header';
+        h.textContent = d;
+        grid.appendChild(h);
+      });
+
+      const firstWeekday = new Date(viewYear, viewMonth, 1).getDay();
+      const daysInMonth  = new Date(viewYear, viewMonth + 1, 0).getDate();
+
+      // Empty leading cells
+      for (let i = 0; i < firstWeekday; i++) {
+        const e = document.createElement('div');
+        e.className = 'bk-cal-cell bk-cell-empty';
+        grid.appendChild(e);
+      }
+
+      // Day cells
+      for (let d = 1; d <= daysInMonth; d++) {
+        const key      = toKey(viewYear, viewMonth, d);
+        const cellDate = new Date(viewYear, viewMonth, d);
+        const isPast   = cellDate < TODAY;
+        const isToday  = cellDate.getTime() === TODAY.getTime();
+
+        const owner  = OWNER_EVENTS[key];
+        const client = CLIENT_BOOKINGS[key];
+
+        const cell = document.createElement('div');
+        cell.className = 'bk-cal-cell';
+        if (isPast)  cell.classList.add('bk-cell-past');
+        if (isToday) cell.classList.add('bk-cell-today');
+
+        const num = document.createElement('span');
+        num.className = 'bk-day-num';
+        num.textContent = d;
+        cell.appendChild(num);
+
+        if (!isPast) {
+          if (owner) {
+            // ── Owner event ──
+            cell.classList.add('bk-cell-owner');
+            cell.classList.add('bk-cell-clickable');
+            const pill = document.createElement('span');
+            pill.className = 'bk-pill bk-pill-owner';
+            pill.textContent = owner.name;
+            cell.appendChild(pill);
+            const detail = document.createElement('span');
+            detail.className = 'bk-cell-detail';
+            detail.textContent = owner.detail;
+            cell.appendChild(detail);
+            cell.addEventListener('click', () => openEventModal(key));
+
+          } else if (client) {
+            // ── Client booking ──
+            cell.classList.add('bk-cell-private');
+            const pill = document.createElement('span');
+            pill.className = 'bk-pill bk-pill-private';
+            pill.textContent = 'Private event';
+            cell.appendChild(pill);
+
+            const available = getAvailableSlots(key);
+            if (available.length > 0) {
+              // Some slots still open — allow booking
+              const open = document.createElement('span');
+              open.className = 'bk-slots-open';
+              open.textContent = 'Some slots open';
+              cell.appendChild(open);
+              cell.classList.add('bk-cell-clickable');
+              cell.addEventListener('click', () => openModal(key, d, available));
+            }
+            // else: fully booked — no click, no extra info
+
+          } else {
+            // ── Fully available ──
+            cell.classList.add('bk-cell-available');
+            cell.classList.add('bk-cell-clickable');
+            const avail = document.createElement('span');
+            avail.className = 'bk-avail-label';
+            avail.textContent = '+ Available';
+            cell.appendChild(avail);
+            cell.addEventListener('click', () => openModal(key, d, ALL_SLOTS));
+          }
+        }
+
+        grid.appendChild(cell);
+      }
+    }
+
+    document.getElementById('prevMonth').addEventListener('click', () => {
+      viewMonth--;
+      if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+      renderCalendar();
+    });
+
+    document.getElementById('nextMonth').addEventListener('click', () => {
+      viewMonth++;
+      if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+      renderCalendar();
+    });
+
+    // ─────────────────────────────────────────────
+    // MODAL
+    // ─────────────────────────────────────────────
+
+    const overlay = document.getElementById('overlay');
+    let selectedSlot     = null;
+    let selectedCatering = 'none';
+
+    function openModal(key, day, availableSlots) {
+      selectedSlot     = null;
+      selectedCatering = 'none';
+
+      const [y, m] = key.split('-');
+      const title  = `${MONTH_NAMES[parseInt(m, 10) - 1]} ${day}, ${y}`;
+
+      document.getElementById('modalContent').innerHTML = buildForm(title, availableSlots);
+      overlay.classList.add('bk-overlay-active');
+      overlay.removeAttribute('aria-hidden');
+      document.body.style.overflow = 'hidden';
+
+      // Slot card interaction
+      document.querySelectorAll('.bk-slot-card:not(.bk-slot-taken)').forEach(card => {
+        card.addEventListener('click', () => {
+          document.querySelectorAll('.bk-slot-card').forEach(c => c.classList.remove('bk-slot-selected'));
+          card.classList.add('bk-slot-selected');
+          selectedSlot = card.dataset.slot;
+          document.getElementById('slotError').hidden = true;
+        });
+      });
+
+      // Catering card interaction
+      document.querySelectorAll('.bk-catering-card').forEach(card => {
+        card.addEventListener('click', () => {
+          document.querySelectorAll('.bk-catering-card').forEach(c => c.classList.remove('bk-catering-selected'));
+          card.classList.add('bk-catering-selected');
+          selectedCatering = card.dataset.catering;
+        });
+      });
+
+      // Default: "No catering needed" pre-selected
+      const nocat = document.querySelector('.bk-catering-card[data-catering="none"]');
+      if (nocat) nocat.classList.add('bk-catering-selected');
+
+      // Form submit
+      document.getElementById('bookingForm').addEventListener('submit', handleSubmit);
+    }
+
+    function closeModal() {
+      overlay.classList.remove('bk-overlay-active');
+      overlay.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    document.getElementById('modalClose').addEventListener('click', closeModal);
+    overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+    // ─────────────────────────────────────────────
+    // FORM BUILDER
+    // ─────────────────────────────────────────────
+
+    function buildForm(title, availableSlots) {
+      // Build slot cards
+      const slotCards = ALL_SLOTS.map(slot => {
+        // full_day unavailable if any individual slot is already booked on this day
+        const unavailable = !availableSlots.includes(slot);
+        const cls = unavailable ? 'bk-slot-card bk-slot-taken' : 'bk-slot-card';
+        return `
+          <div class="${cls}" data-slot="${slot}">
+            <span class="bk-slot-label">${SLOT_INFO[slot].label}</span>
+            <span class="bk-slot-time">${SLOT_INFO[slot].time}</span>
+            ${unavailable ? '<span class="bk-slot-unavail">Unavailable</span>' : ''}
+          </div>`;
+      }).join('');
+
+      // Build catering cards
+      const cateringCards = CATERING_OPTIONS.map(c => `
+        <div class="bk-catering-card" data-catering="${c.id}">
+          ${c.popular ? '<span class="bk-popular-badge">Most popular</span>' : ''}
+          <span class="bk-catering-label">${c.label}</span>
+          <span class="bk-catering-sub">${c.sub}</span>
+        </div>`
+      ).join('');
+
+      // Build event type options
+      const typeOptions = EVENT_TYPES.map(t =>
+        `<option value="${t}">${t}</option>`
+      ).join('');
+
+      return `
+        <h2 class="bk-modal-title" id="modalTitle">Book for ${title}</h2>
+        <form id="bookingForm" novalidate>
+
+          <div class="bk-field-row">
+            <div class="bk-field">
+              <label class="bk-label" for="fname">Full Name <span class="bk-req">*</span></label>
+              <input class="bk-input" type="text" id="fname" name="fname" placeholder="Your full name" autocomplete="name" />
+            </div>
+            <div class="bk-field">
+              <label class="bk-label" for="email">Email</label>
+              <input class="bk-input" type="email" id="email" name="email" placeholder="your@email.com" autocomplete="email" />
+            </div>
+          </div>
+
+          <div class="bk-field-row">
+            <div class="bk-field">
+              <label class="bk-label" for="phone">Phone Number</label>
+              <input class="bk-input" type="tel" id="phone" name="phone" placeholder="(401) 000-0000" autocomplete="tel" />
+            </div>
+            <div class="bk-field">
+              <label class="bk-label" for="etype">Event Type <span class="bk-req">*</span></label>
+              <select class="bk-input bk-select" id="etype" name="etype">
+                <option value="">Select event type…</option>
+                ${typeOptions}
+              </select>
+            </div>
+          </div>
+
+          <div class="bk-field" style="max-width: 200px;">
+            <label class="bk-label" for="guests">Est. Guest Count <span class="bk-req">*</span></label>
+            <input class="bk-input" type="number" id="guests" name="guests" min="1" max="500" placeholder="e.g. 30" />
+          </div>
+
+          <div class="bk-section-label">Time Slot <span class="bk-req">*</span></div>
+          <div class="bk-slot-grid">${slotCards}</div>
+          <div class="bk-error" id="slotError" hidden>Please select an available time slot.</div>
+
+          <div class="bk-section-label" style="margin-top: 24px;">Catering Add-On</div>
+          <div class="bk-catering-grid">${cateringCards}</div>
+
+          <div class="bk-field" style="margin-top: 20px;">
+            <label class="bk-label" for="notes">Additional Notes</label>
+            <textarea class="bk-input bk-textarea" id="notes" name="notes" placeholder="Any special requests or details about your event…"></textarea>
+          </div>
+
+          <div class="bk-error" id="formError" hidden>Please fill in all required fields marked with *</div>
+
+          <button type="submit" class="bk-submit">Send Request</button>
+        </form>`;
+    }
+
+    // ─────────────────────────────────────────────
+    // SUBMIT HANDLER
+    // ─────────────────────────────────────────────
+
+    function handleSubmit(e) {
+      e.preventDefault();
+      const form   = e.target;
+      const fname  = form.fname.value.trim();
+      const etype  = form.etype.value;
+      const guests = form.guests.value.trim();
+
+      const formError = document.getElementById('formError');
+      const slotError = document.getElementById('slotError');
+      formError.hidden = true;
+      slotError.hidden = true;
+
+      let valid = true;
+      if (!fname || !etype || !guests) {
+        formError.hidden = false;
+        valid = false;
+      }
+      if (!selectedSlot) {
+        slotError.hidden = false;
+        valid = false;
+      }
+      if (!valid) return;
+
+      const cateringLabel = CATERING_LABELS[selectedCatering] || 'No catering';
+
+      document.getElementById('modalContent').innerHTML = `
+        <div class="bk-confirm">
+          <div class="bk-confirm-icon">✓</div>
+          <h2 class="bk-confirm-title">Request received!</h2>
+          <p class="bk-confirm-msg">We'll be in touch within 24 hours.</p>
+          <div class="bk-confirm-detail">
+            <span>Catering selection:</span>
+            <strong>${cateringLabel}</strong>
+          </div>
+          <button class="bk-submit bk-submit-outline" onclick="closeModal()" style="margin-top: 28px;">Close</button>
+        </div>`;
+    }
+
+    // ─────────────────────────────────────────────
+    // OWNER EVENT DETAIL MODAL
+    // ─────────────────────────────────────────────
+
+    function openEventModal(key) {
+      const ev = OWNER_EVENTS[key];
+      if (!ev) return;
+
+      const flyerHTML = ev.flyer
+        ? `<div class="bk-event-flyer"><img src="${ev.flyer}" alt="${ev.name} flyer" /></div>`
+        : `<div class="bk-event-flyer" style="background:#f0eef9; flex-direction:column; gap:6px;">
+             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#534AB7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>
+             <span style="font-size:12px;color:#9490cc;font-weight:500;">Flyer coming soon</span>
+           </div>`;
+
+      document.getElementById('modalContent').innerHTML = `
+        <h2 class="bk-modal-title" id="modalTitle">${ev.name}</h2>
+        ${flyerHTML}
+        <span class="bk-event-tag">${ev.tag}</span>
+        <div class="bk-event-meta">
+          <span class="bk-event-meta-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            ${ev.date}
+          </span>
+          <span class="bk-event-meta-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            ${ev.location}
+          </span>
+        </div>
+        <p class="bk-event-desc">${ev.desc}</p>
+        <button class="bk-submit bk-submit-outline" onclick="closeModal()">Close</button>`;
+
+      overlay.classList.add('bk-overlay-active');
+      overlay.removeAttribute('aria-hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    // ─────────────────────────────────────────────
+    // INIT
+    // ─────────────────────────────────────────────
+    renderCalendar();
+  </script>
+
+</body>
+</html>
