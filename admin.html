@@ -22,7 +22,7 @@
   </div>
 
   <!-- ADMIN CONTENT -->
-  <div id="admContent" hidden>
+  <div id="admContent" style="display:none">
 
     <!-- NAV -->
     <nav>
@@ -172,34 +172,37 @@
     };
 
     // ── AUTH ──
-    if (sessionStorage.getItem('adm_auth') === '1') unlock();
-
-    document.getElementById('admLoginBtn').addEventListener('click', tryLogin);
-    document.getElementById('admPassword').addEventListener('keydown', e => {
-      if (e.key === 'Enter') tryLogin();
-    });
-
     function tryLogin() {
-      if (document.getElementById('admPassword').value === ADM_PASSWORD) {
+      const val = document.getElementById('admPassword').value;
+      const err = document.getElementById('admGateError');
+      if (val === ADM_PASSWORD) {
         sessionStorage.setItem('adm_auth', '1');
-        unlock();
+        document.getElementById('admGate').style.display = 'none';
+        document.getElementById('admContent').style.display = 'block';
+        renderCalList();
+        renderEvList();
       } else {
-        document.getElementById('admGateError').hidden = false;
+        err.hidden = false;
       }
     }
 
-    function unlock() {
-      document.getElementById('admGate').hidden = true;
-      document.getElementById('admContent').hidden = false;
+    document.getElementById('admLoginBtn').onclick = tryLogin;
+    document.getElementById('admPassword').onkeydown = function(e) {
+      if (e.key === 'Enter') tryLogin();
+    };
+
+    if (sessionStorage.getItem('adm_auth') === '1') {
+      document.getElementById('admGate').style.display = 'none';
+      document.getElementById('admContent').style.display = 'block';
       renderCalList();
       renderEvList();
     }
 
-    document.getElementById('admLogout').addEventListener('click', () => {
+    document.getElementById('admLogout').onclick = function() {
       sessionStorage.removeItem('adm_auth');
-      document.getElementById('admGate').hidden = false;
-      document.getElementById('admContent').hidden = true;
-    });
+      document.getElementById('admGate').style.display = 'flex';
+      document.getElementById('admContent').style.display = 'none';
+    };
 
     // ── TABS ──
     document.querySelectorAll('.adm-tab').forEach(tab => {
