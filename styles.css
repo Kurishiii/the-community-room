@@ -27,11 +27,19 @@ nav {
   top: 0;
   z-index: 100;
   background: var(--black);
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr;
   align-items: center;
-  justify-content: space-between;
   padding: 0 32px;
   height: 72px;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  list-style: none;
 }
 
 .nav-logo {
@@ -64,13 +72,6 @@ nav {
 .nav-logo-circle .urban     { font-size: 11px; font-weight: 700; color: var(--white); text-transform: uppercase; letter-spacing: 1px; }
 .nav-logo-circle .collective{ font-family: Georgia, serif; font-style: italic; font-size: 9px; color: var(--white); }
 .nav-logo-circle .tagline   { font-size: 5px; color: var(--gray); letter-spacing: 2px; text-transform: uppercase; margin-top: 2px; }
-
-.nav-links {
-  display: flex;
-  align-items: center;
-  gap: 32px;
-  list-style: none;
-}
 
 .nav-links a {
   color: var(--white);
@@ -759,6 +760,7 @@ footer {
 .bk-dot-partial   { background: #f59e0b; }
 .bk-dot-private   { background: #b0b0b0; }
 .bk-dot-owner     { background: var(--purple); }
+.bk-dot-tours     { background: #e03030; }
 
 /* Calendar nav */
 .bk-cal-nav {
@@ -1818,3 +1820,72 @@ footer {
   .collab-band-side { border-left: none; border-top: 1px solid rgba(255,255,255,0.08); }
   .about-photo-scroll { padding: 0 20px 32px; }
 }
+
+/* ── COLLAB SLIDESHOW ── */
+.collab-slideshow {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 320px;
+  overflow: hidden;
+}
+
+.collab-slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray);
+  font-size: 13px;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.collab-slide.active { opacity: 1; }
+
+.collab-slide-prev,
+.collab-slide-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.4);
+  border: none;
+  color: #fff;
+  font-size: 24px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  transition: background 0.2s;
+}
+.collab-slide-prev:hover,
+.collab-slide-next:hover { background: rgba(0,0,0,0.7); }
+.collab-slide-prev { left: 12px; }
+.collab-slide-next { right: 12px; }
+
+.collab-slide-dots {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  z-index: 2;
+}
+
+.collab-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.4);
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.2s;
+}
+.collab-dot-active { background: #fff; }
