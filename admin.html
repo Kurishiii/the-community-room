@@ -258,6 +258,7 @@
       saveCalEvents(events);
       e.target.reset();
       renderCalList();
+      showToast('Calendar event added! <a href="book.html" target="_blank">View Calendar →</a>');
     });
 
     function renderCalList() {
@@ -309,6 +310,7 @@
       saveEvCards(cards);
       e.target.reset();
       renderEvList();
+      showToast('Event card added! <a href="events.html" target="_blank">View Events Page →</a>');
     });
 
     function renderEvList() {
@@ -339,6 +341,18 @@
       const cards = getEvCards().filter(c => c.id !== id);
       saveEvCards(cards);
       renderEvList();
+    }
+
+    function showToast(msg) {
+      const existing = document.getElementById('admToast');
+      if (existing) existing.remove();
+      const toast = document.createElement('div');
+      toast.id = 'admToast';
+      toast.className = 'adm-toast';
+      toast.innerHTML = msg;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.classList.add('adm-toast-show'), 10);
+      setTimeout(() => { toast.classList.remove('adm-toast-show'); setTimeout(() => toast.remove(), 300); }, 4000);
     }
   </script>
 

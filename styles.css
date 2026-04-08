@@ -1721,3 +1721,31 @@ footer {
   .adm-two-col { grid-template-columns: 1fr; }
   .adm-page { padding: 40px 20px 60px; }
 }
+
+.adm-toast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--black);
+  color: var(--white);
+  padding: 14px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0;
+  transition: opacity 0.25s, transform 0.25s;
+  z-index: 9999;
+  white-space: nowrap;
+}
+
+.adm-toast a {
+  color: #7eb8f7;
+  text-decoration: underline;
+  margin-left: 8px;
+}
+
+.adm-toast-show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}

@@ -154,19 +154,21 @@
       grid.appendChild(el);
     });
 
-    // Filter logic (runs after all cards are in the DOM)
-    const btns  = document.querySelectorAll('.ev-filter-btn');
-    const cards = document.querySelectorAll('.ev-card');
-
-    btns.forEach(btn => {
+    // Filter logic
+    document.querySelectorAll('.ev-filter-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        btns.forEach(b => b.classList.remove('ev-filter-active'));
+        document.querySelectorAll('.ev-filter-btn').forEach(b => b.classList.remove('ev-filter-active'));
         btn.classList.add('ev-filter-active');
         const filter = btn.dataset.filter;
         document.querySelectorAll('.ev-card').forEach(card => {
           card.style.display = (filter === 'all' || card.dataset.category === filter) ? '' : 'none';
         });
       });
+    });
+
+    // Reload page if admin updates events in another tab
+    window.addEventListener('storage', e => {
+      if (e.key === 'uc_events_page') location.reload();
     });
   </script>
 
