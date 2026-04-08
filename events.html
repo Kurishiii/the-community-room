@@ -124,16 +124,46 @@
   </footer>
 
   <script>
-    const btns = document.querySelectorAll('.ev-filter-btn');
+    const CATEGORY_COLORS = {
+      music:     'linear-gradient(160deg, #1a1a2e 0%, #4a3060 100%)',
+      community: 'linear-gradient(160deg, #2d2d2d 0%, #5a4a3a 100%)',
+      arts:      'linear-gradient(160deg, #1e3a2f 0%, #2d6a4f 100%)',
+      wellness:  'linear-gradient(160deg, #2e1a1a 0%, #7a3b3b 100%)',
+    };
+
+    // Load admin-added event cards from localStorage
+    const grid = document.getElementById('evGrid');
+    const stored = JSON.parse(localStorage.getItem('uc_events_page') || '[]');
+    stored.forEach(card => {
+      const label = card.category.charAt(0).toUpperCase() + card.category.slice(1);
+      const flyerHTML = card.flyer
+        ? `<img src="${card.flyer}" alt="${card.name}" style="width:100%;height:100%;object-fit:cover;" />`
+        : `<span class="ev-flyer-placeholder">${label}</span>`;
+      const el = document.createElement('div');
+      el.className = 'ev-card';
+      el.dataset.category = card.category;
+      el.innerHTML = `
+        <div class="ev-flyer" style="background:${card.flyer ? '#111' : (CATEGORY_COLORS[card.category] || '#333')}">
+          ${flyerHTML}
+        </div>
+        <div class="ev-card-info">
+          <span class="ev-card-tag">${label}</span>
+          <h3 class="ev-card-name">${card.name}</h3>
+          <p class="ev-card-date">${card.date}</p>
+        </div>`;
+      grid.appendChild(el);
+    });
+
+    // Filter logic (runs after all cards are in the DOM)
+    const btns  = document.querySelectorAll('.ev-filter-btn');
     const cards = document.querySelectorAll('.ev-card');
 
     btns.forEach(btn => {
       btn.addEventListener('click', () => {
         btns.forEach(b => b.classList.remove('ev-filter-active'));
         btn.classList.add('ev-filter-active');
-
         const filter = btn.dataset.filter;
-        cards.forEach(card => {
+        document.querySelectorAll('.ev-card').forEach(card => {
           card.style.display = (filter === 'all' || card.dataset.category === filter) ? '' : 'none';
         });
       });

@@ -134,6 +134,9 @@
       },
     };
 
+    // Merge admin-added events from localStorage
+    Object.assign(OWNER_EVENTS, JSON.parse(localStorage.getItem('uc_owner_events') || '{}'));
+
     // CLIENT bookings: only "Private event" is ever shown — no details exposed
     // Slots: 'morning' (8am–12pm), 'afternoon' (12–5pm), 'evening' (5–10pm), 'full_day' (8am–10pm)
     const CLIENT_BOOKINGS = {

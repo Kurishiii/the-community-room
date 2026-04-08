@@ -1486,3 +1486,238 @@ footer {
 @media (max-width: 600px) {
   .ev-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; padding: 0 20px 60px; }
 }
+
+/* ── ADMIN PAGE ── */
+.adm-gate {
+  position: fixed;
+  inset: 0;
+  background: var(--black);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 999;
+}
+
+.adm-gate-box {
+  background: var(--black-soft);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  padding: 48px 40px;
+  width: 100%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+}
+
+.adm-gate-box h2 {
+  color: var(--white);
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.adm-gate-box p {
+  color: var(--gray);
+  font-size: 14px;
+  margin-bottom: 4px;
+}
+
+.adm-gate-box .bk-input {
+  width: 100%;
+  background: rgba(255,255,255,0.05);
+  border-color: rgba(255,255,255,0.12);
+  color: var(--white);
+}
+
+.adm-gate-box .bk-submit {
+  width: 100%;
+  margin-top: 4px;
+}
+
+.adm-gate-error {
+  color: #e05555;
+  font-size: 13px;
+}
+
+.adm-logout-btn {
+  background: none;
+  border: 1.5px solid rgba(255,255,255,0.2);
+  border-radius: 999px;
+  color: var(--white);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 500;
+  padding: 6px 18px;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.adm-logout-btn:hover { border-color: var(--white); }
+
+.adm-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 56px 40px 80px;
+}
+
+.adm-header {
+  margin-bottom: 36px;
+}
+
+.adm-header h1 {
+  font-size: clamp(24px, 4vw, 36px);
+  font-weight: 700;
+  color: var(--black);
+}
+
+.adm-header p {
+  color: var(--mid-gray);
+  font-size: 15px;
+  margin-top: 6px;
+}
+
+.adm-tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 2px solid var(--light-gray);
+  margin-bottom: 40px;
+}
+
+.adm-tab {
+  background: none;
+  border: none;
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--gray);
+  padding: 10px 24px;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.adm-tab:hover { color: var(--black); }
+
+.adm-tab-active {
+  color: var(--black);
+  border-bottom-color: var(--black);
+}
+
+.adm-panel-hidden { display: none; }
+
+.adm-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: start;
+}
+
+.adm-section-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--black);
+  margin-bottom: 20px;
+}
+
+.adm-optional {
+  font-weight: 400;
+  color: var(--gray);
+  font-size: 12px;
+}
+
+.adm-file-input {
+  display: block;
+  width: 100%;
+  font-family: var(--font);
+  font-size: 13px;
+  color: var(--dark);
+  margin-top: 6px;
+}
+
+.adm-file-note {
+  display: block;
+  font-size: 12px;
+  color: var(--gray);
+  margin-top: 4px;
+}
+
+.adm-form-error {
+  color: #e05555;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.adm-list-note {
+  font-size: 12px;
+  color: var(--gray);
+  margin-bottom: 20px;
+}
+
+.adm-empty {
+  color: var(--gray);
+  font-size: 14px;
+  font-style: italic;
+}
+
+.adm-list-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--light-gray);
+}
+
+.adm-list-thumb {
+  width: 40px;
+  height: 52px;
+  object-fit: cover;
+  border-radius: 3px;
+  flex-shrink: 0;
+}
+
+.adm-list-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.adm-list-info strong {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--black);
+}
+
+.adm-list-info span {
+  font-size: 12px;
+  color: var(--gray);
+}
+
+.adm-delete-btn {
+  background: none;
+  border: 1.5px solid #e0b0b0;
+  border-radius: 999px;
+  color: #c04040;
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 14px;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.15s, color 0.15s;
+}
+
+.adm-delete-btn:hover {
+  background: #c04040;
+  color: var(--white);
+  border-color: #c04040;
+}
+
+@media (max-width: 768px) {
+  .adm-two-col { grid-template-columns: 1fr; }
+  .adm-page { padding: 40px 20px 60px; }
+}

@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin | The Urban Collective</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- PASSWORD GATE -->
+  <div class="adm-gate" id="admGate">
+    <div class="adm-gate-box">
+      <img src="logo.PNG" alt="The Urban Collective" style="height:64px;width:auto;margin-bottom:24px;" />
+      <h2>Admin Access</h2>
+      <p>Enter your password to continue</p>
+      <input type="password" class="bk-input" id="admPassword" placeholder="Password" />
+      <div class="adm-gate-error" id="admGateError" hidden>Incorrect password.</div>
+      <button class="bk-submit" id="admLoginBtn">Enter</button>
+    </div>
+  </div>
+
+  <!-- ADMIN CONTENT -->
+  <div id="admContent" hidden>
+
+    <!-- NAV -->
+    <nav>
+      <a href="index.html" class="nav-logo">
+        <img src="logo.PNG" alt="The Urban Collective" class="nav-logo-img" />
+      </a>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="events.html">Events</a></li>
+        <li><a href="book.html">Book With Us!</a></li>
+        <li><a href="admin.html" class="active">Admin</a></li>
+      </ul>
+      <button class="adm-logout-btn" id="admLogout">Log Out</button>
+    </nav>
+
+    <div class="adm-page">
+
+      <div class="adm-header">
+        <h1>Admin Dashboard</h1>
+        <p>Add and manage events on the calendar and events page</p>
+      </div>
+
+      <!-- TABS -->
+      <div class="adm-tabs">
+        <button class="adm-tab adm-tab-active" data-tab="calendar">Calendar Events</button>
+        <button class="adm-tab" data-tab="eventspage">Events Page</button>
+      </div>
+
+      <!-- ── CALENDAR EVENTS TAB ── -->
+      <div class="adm-panel" id="tab-calendar">
+        <div class="adm-two-col">
+
+          <div class="adm-form-wrap">
+            <h3 class="adm-section-title">Add Calendar Event</h3>
+            <form id="calForm">
+              <div class="bk-field">
+                <label class="bk-label" for="cal-date">Date <span class="bk-req">*</span></label>
+                <input class="bk-input" type="date" id="cal-date" required />
+              </div>
+              <div class="bk-field">
+                <label class="bk-label" for="cal-name">Event Name <span class="bk-req">*</span></label>
+                <input class="bk-input" type="text" id="cal-name" placeholder="e.g. Sweet Mondays Brunch" required />
+              </div>
+              <div class="bk-field">
+                <label class="bk-label" for="cal-tag">Tag</label>
+                <input class="bk-input" type="text" id="cal-tag" placeholder="e.g. Community Event" />
+              </div>
+              <div class="bk-field">
+                <label class="bk-label" for="cal-display-date">Display Date <span class="bk-req">*</span></label>
+                <input class="bk-input" type="text" id="cal-display-date" placeholder="e.g. Friday, April 10 · 10am – 2pm" required />
+              </div>
+              <div class="bk-field">
+                <label class="bk-label" for="cal-location">Location</label>
+                <input class="bk-input" type="text" id="cal-location" placeholder="The Urban Collective Studio" />
+              </div>
+              <div class="bk-field">
+                <label class="bk-label" for="cal-detail">Short Detail</label>
+                <input class="bk-input" type="text" id="cal-detail" placeholder="e.g. Community event · Open to all" />
+              </div>
+              <div class="bk-field">
+                <label class="bk-label" for="cal-desc">Description</label>
+                <textarea class="bk-input bk-textarea" id="cal-desc" placeholder="Full event description shown in the popup…"></textarea>
+              </div>
+              <div class="bk-field">
+                <label class="bk-label" for="cal-flyer">Flyer Image <span class="adm-optional">(optional)</span></label>
+                <input class="adm-file-input" type="file" id="cal-flyer" accept="image/*" />
+              </div>
+              <p class="adm-form-error" id="calFormError" hidden>Please fill in all required fields.</p>
+              <button type="submit" class="bk-submit">Add to Calendar</button>
+            </form>
+          </div>
+
+          <div class="adm-list-wrap">
+            <h3 class="adm-section-title">Your Calendar Events</h3>
+            <p class="adm-list-note">These are events you've added. Hardcoded events in the code are not shown here.</p>
+            <div id="calList"></div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── EVENTS PAGE TAB ── -->
+      <div class="adm-panel adm-panel-hidden" id="tab-eventspage">
+        <div class="adm-two-col">
+
+          <div class="adm-form-wrap">
+            <h3 class="adm-section-title">Add Event Card</h3>
+            <form id="evForm">
+              <div class="bk-field">
+                <label class="bk-label" for="ev-name">Event Name <span class="bk-req">*</span></label>
+                <input class="bk-input" type="text" id="ev-name" placeholder="e.g. Matcha & Music Night" required />
+              </div>
+              <div class="bk-field">
+                <label class="bk-label" for="ev-date">Display Date <span class="bk-req">*</span></label>
+                <input class="bk-input" type="text" id="ev-date" placeholder="e.g. Sunday, May 3 · 6pm – 10pm" required />
+              </div>
+              <div class="bk-field">
+                <label class="bk-label" for="ev-category">Category <span class="bk-req">*</span></label>
+                <select class="bk-input bk-select" id="ev-category" required>
+                  <option value="">Select category…</option>
+                  <option value="music">Music</option>
+                  <option value="community">Community</option>
+                  <option value="arts">Arts</option>
+                  <option value="wellness">Wellness</option>
+                </select>
+              </div>
+              <div class="bk-field">
+                <label class="bk-label" for="ev-flyer">Flyer Image <span class="adm-optional">(optional)</span></label>
+                <input class="adm-file-input" type="file" id="ev-flyer" accept="image/*" />
+                <span class="adm-file-note">If no flyer is uploaded, a colored placeholder will be shown.</span>
+              </div>
+              <p class="adm-form-error" id="evFormError" hidden>Please fill in all required fields.</p>
+              <button type="submit" class="bk-submit">Add Event Card</button>
+            </form>
+          </div>
+
+          <div class="adm-list-wrap">
+            <h3 class="adm-section-title">Your Event Cards</h3>
+            <p class="adm-list-note">These are cards you've added. Placeholder cards in the code are not shown here.</p>
+            <div id="evList"></div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+
+    <footer>
+      <div class="footer-inner">
+        <span class="footer-brand">The Urban Collective</span>
+      </div>
+      <div class="footer-copy">© 2026</div>
+    </footer>
+
+  </div>
+
+  <script>
+    const ADM_PASSWORD = 'admin2026';
+    const CAL_KEY = 'uc_owner_events';
+    const EV_KEY  = 'uc_events_page';
+
+    const CATEGORY_COLORS = {
+      music:     'linear-gradient(160deg, #1a1a2e 0%, #4a3060 100%)',
+      community: 'linear-gradient(160deg, #2d2d2d 0%, #5a4a3a 100%)',
+      arts:      'linear-gradient(160deg, #1e3a2f 0%, #2d6a4f 100%)',
+      wellness:  'linear-gradient(160deg, #2e1a1a 0%, #7a3b3b 100%)',
+    };
+
+    // ── AUTH ──
+    if (sessionStorage.getItem('adm_auth') === '1') unlock();
+
+    document.getElementById('admLoginBtn').addEventListener('click', tryLogin);
+    document.getElementById('admPassword').addEventListener('keydown', e => {
+      if (e.key === 'Enter') tryLogin();
+    });
+
+    function tryLogin() {
+      if (document.getElementById('admPassword').value === ADM_PASSWORD) {
+        sessionStorage.setItem('adm_auth', '1');
+        unlock();
+      } else {
+        document.getElementById('admGateError').hidden = false;
+      }
+    }
+
+    function unlock() {
+      document.getElementById('admGate').hidden = true;
+      document.getElementById('admContent').hidden = false;
+      renderCalList();
+      renderEvList();
+    }
+
+    document.getElementById('admLogout').addEventListener('click', () => {
+      sessionStorage.removeItem('adm_auth');
+      document.getElementById('admGate').hidden = false;
+      document.getElementById('admContent').hidden = true;
+    });
+
+    // ── TABS ──
+    document.querySelectorAll('.adm-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.adm-tab').forEach(t => t.classList.remove('adm-tab-active'));
+        document.querySelectorAll('.adm-panel').forEach(p => p.classList.add('adm-panel-hidden'));
+        tab.classList.add('adm-tab-active');
+        document.getElementById('tab-' + tab.dataset.tab).classList.remove('adm-panel-hidden');
+      });
+    });
+
+    // ── HELPERS ──
+    function getCalEvents() { return JSON.parse(localStorage.getItem(CAL_KEY) || '{}'); }
+    function getEvCards()   { return JSON.parse(localStorage.getItem(EV_KEY)  || '[]'); }
+    function saveCalEvents(d) { localStorage.setItem(CAL_KEY, JSON.stringify(d)); }
+    function saveEvCards(d)   { localStorage.setItem(EV_KEY,  JSON.stringify(d)); }
+
+    function readFileAsBase64(file) {
+      return new Promise((resolve) => {
+        if (!file) { resolve(null); return; }
+        const reader = new FileReader();
+        reader.onload = e => resolve(e.target.result);
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // ── CALENDAR FORM ──
+    document.getElementById('calForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const date        = document.getElementById('cal-date').value;
+      const name        = document.getElementById('cal-name').value.trim();
+      const displayDate = document.getElementById('cal-display-date').value.trim();
+
+      if (!date || !name || !displayDate) {
+        document.getElementById('calFormError').hidden = false;
+        return;
+      }
+      document.getElementById('calFormError').hidden = true;
+
+      const flyerFile = document.getElementById('cal-flyer').files[0];
+      const flyer     = await readFileAsBase64(flyerFile);
+
+      const events = getCalEvents();
+      events[date] = {
+        name,
+        tag:      document.getElementById('cal-tag').value.trim() || 'Event',
+        date:     displayDate,
+        location: document.getElementById('cal-location').value.trim() || 'The Urban Collective Studio',
+        detail:   document.getElementById('cal-detail').value.trim(),
+        desc:     document.getElementById('cal-desc').value.trim(),
+        flyer,
+      };
+      saveCalEvents(events);
+      e.target.reset();
+      renderCalList();
+    });
+
+    function renderCalList() {
+      const list   = document.getElementById('calList');
+      const events = getCalEvents();
+      const keys   = Object.keys(events);
+
+      if (keys.length === 0) {
+        list.innerHTML = '<p class="adm-empty">No events added yet.</p>';
+        return;
+      }
+
+      list.innerHTML = keys.sort().map(key => `
+        <div class="adm-list-item">
+          <div class="adm-list-info">
+            <strong>${events[key].name}</strong>
+            <span>${key} · ${events[key].tag}</span>
+          </div>
+          <button class="adm-delete-btn" onclick="deleteCalEvent('${key}')">Remove</button>
+        </div>
+      `).join('');
+    }
+
+    function deleteCalEvent(key) {
+      const events = getCalEvents();
+      delete events[key];
+      saveCalEvents(events);
+      renderCalList();
+    }
+
+    // ── EVENTS PAGE FORM ──
+    document.getElementById('evForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const name     = document.getElementById('ev-name').value.trim();
+      const date     = document.getElementById('ev-date').value.trim();
+      const category = document.getElementById('ev-category').value;
+
+      if (!name || !date || !category) {
+        document.getElementById('evFormError').hidden = false;
+        return;
+      }
+      document.getElementById('evFormError').hidden = true;
+
+      const flyerFile = document.getElementById('ev-flyer').files[0];
+      const flyer     = await readFileAsBase64(flyerFile);
+
+      const cards = getEvCards();
+      cards.push({ name, date, category, flyer, id: Date.now() });
+      saveEvCards(cards);
+      e.target.reset();
+      renderEvList();
+    });
+
+    function renderEvList() {
+      const list  = document.getElementById('evList');
+      const cards = getEvCards();
+
+      if (cards.length === 0) {
+        list.innerHTML = '<p class="adm-empty">No event cards added yet.</p>';
+        return;
+      }
+
+      list.innerHTML = cards.map(card => `
+        <div class="adm-list-item">
+          ${card.flyer
+            ? `<img src="${card.flyer}" class="adm-list-thumb" alt="${card.name}" />`
+            : `<div class="adm-list-thumb" style="background:${CATEGORY_COLORS[card.category] || '#333'}"></div>`
+          }
+          <div class="adm-list-info">
+            <strong>${card.name}</strong>
+            <span>${card.date} · ${card.category.charAt(0).toUpperCase() + card.category.slice(1)}</span>
+          </div>
+          <button class="adm-delete-btn" onclick="deleteEvCard(${card.id})">Remove</button>
+        </div>
+      `).join('');
+    }
+
+    function deleteEvCard(id) {
+      const cards = getEvCards().filter(c => c.id !== id);
+      saveEvCards(cards);
+      renderEvList();
+    }
+  </script>
+
+</body>
+</html>
