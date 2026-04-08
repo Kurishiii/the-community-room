@@ -538,51 +538,7 @@ footer {
   color: var(--mid-gray);
 }
 
-/* ── COLLAB BAND ── */
-.collab-band {
-  background: var(--black);
-  padding: 80px 40px;
-}
-
-.collab-band-inner {
-  max-width: 700px;
-}
-
-.collab-band h2 {
-  font-size: clamp(22px, 4vw, 34px);
-  font-weight: 700;
-  color: var(--white);
-  margin-bottom: 20px;
-}
-
-.collab-band > .collab-band-inner > p {
-  font-size: 16px;
-  color: var(--white);
-  opacity: 0.85;
-  margin-bottom: 20px;
-  line-height: 1.7;
-}
-
-.collab-band .inquire-label {
-  font-size: 15px;
-  color: var(--white);
-  opacity: 0.85;
-  margin-bottom: 8px;
-}
-
-.collab-band ul {
-  list-style: disc;
-  padding-left: 28px;
-  margin-bottom: 32px;
-}
-
-.collab-band ul li {
-  font-size: 15px;
-  color: var(--white);
-  opacity: 0.8;
-  margin-bottom: 6px;
-  line-height: 1.6;
-}
+/* ── COLLAB BAND (replaced by two-col layout in new CSS below) ── */
 
 /* ── CART SERVICES PAGE ── */
 .cs-hero-split {
@@ -1748,4 +1704,117 @@ footer {
 .adm-toast-show {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
+}
+
+/* ── ABOUT PHOTO SCROLL ── */
+.about-photo-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0 40px 40px;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.about-photo-scroll::-webkit-scrollbar { display: none; }
+
+.about-photo-track {
+  display: flex;
+  gap: 16px;
+  width: max-content;
+}
+
+.about-photo-item {
+  width: 220px;
+  height: 300px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray);
+  font-size: 13px;
+}
+
+/* ── COLLAB BAND TWO-COL ── */
+.collab-band {
+  background: var(--black);
+  padding: 0;
+}
+
+.collab-band-inner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.collab-band-text {
+  padding: 64px 48px;
+  color: var(--white);
+}
+
+.collab-band-text h2 {
+  font-size: clamp(22px, 3vw, 32px);
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.collab-band-text p {
+  color: rgba(255,255,255,0.75);
+  font-size: 15px;
+  margin-bottom: 8px;
+}
+
+.collab-band-text .inquire-label {
+  font-weight: 600;
+  color: var(--white);
+  margin-top: 16px;
+}
+
+.collab-band-text ul {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 24px;
+}
+
+.collab-band-text ul li {
+  color: rgba(255,255,255,0.7);
+  font-size: 14px;
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.collab-band-side {
+  background: rgba(255,255,255,0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 48px;
+  border-left: 1px solid rgba(255,255,255,0.08);
+}
+
+.collab-band-side-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.collab-side-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+}
+
+.collab-side-text {
+  font-size: 15px;
+  color: rgba(255,255,255,0.7);
+  line-height: 1.6;
+  max-width: 280px;
+}
+
+@media (max-width: 768px) {
+  .collab-band-inner { grid-template-columns: 1fr; }
+  .collab-band-side { border-left: none; border-top: 1px solid rgba(255,255,255,0.08); }
+  .about-photo-scroll { padding: 0 20px 32px; }
 }

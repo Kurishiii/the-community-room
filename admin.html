@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin | The Urban Collective</title>
+  <title>Admin | The Community Room</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -12,7 +12,7 @@
   <!-- PASSWORD GATE -->
   <div class="adm-gate" id="admGate">
     <div class="adm-gate-box">
-      <img src="logo.PNG" alt="The Urban Collective" style="height:64px;width:auto;margin-bottom:24px;" />
+      <img src="logo.PNG" alt="The Community Room" style="height:64px;width:auto;margin-bottom:24px;" />
       <h2>Admin Access</h2>
       <p>Enter your password to continue</p>
       <input type="password" class="bk-input" id="admPassword" placeholder="Password" />
@@ -27,12 +27,12 @@
     <!-- NAV -->
     <nav>
       <a href="index.html" class="nav-logo">
-        <img src="logo.PNG" alt="The Urban Collective" class="nav-logo-img" />
+        <img src="logo.PNG" alt="The Community Room" class="nav-logo-img" />
       </a>
       <ul class="nav-links">
         <li><a href="index.html">Home</a></li>
         <li><a href="events.html">Events</a></li>
-        <li><a href="book.html">Book With Us!</a></li>
+        <li><a href="book.html">Book an Event</a></li>
         <li><a href="admin.html" class="active">Admin</a></li>
       </ul>
       <button class="adm-logout-btn" id="admLogout">Log Out</button>
@@ -76,7 +76,7 @@
               </div>
               <div class="bk-field">
                 <label class="bk-label" for="cal-location">Location</label>
-                <input class="bk-input" type="text" id="cal-location" placeholder="The Urban Collective Studio" />
+                <input class="bk-input" type="text" id="cal-location" placeholder="The Community Room Studio" />
               </div>
               <div class="bk-field">
                 <label class="bk-label" for="cal-detail">Short Detail</label>
@@ -152,7 +152,7 @@
 
     <footer>
       <div class="footer-inner">
-        <span class="footer-brand">The Urban Collective</span>
+        <span class="footer-brand">The Community Room</span>
       </div>
       <div class="footer-copy">© 2026</div>
     </footer>
@@ -250,7 +250,7 @@
         name,
         tag:      document.getElementById('cal-tag').value.trim() || 'Event',
         date:     displayDate,
-        location: document.getElementById('cal-location').value.trim() || 'The Urban Collective Studio',
+        location: document.getElementById('cal-location').value.trim() || 'The Community Room Studio',
         detail:   document.getElementById('cal-detail').value.trim(),
         desc:     document.getElementById('cal-desc').value.trim(),
         flyer,

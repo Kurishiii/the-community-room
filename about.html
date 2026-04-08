@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>About | The Urban Collective</title>
+  <title>About | The Community Room</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -12,21 +12,15 @@
   <!-- NAV -->
   <nav>
     <a href="index.html" class="nav-logo">
-      <img src="logo.PNG" alt="The Urban Collective" class="nav-logo-img" />
+      <img src="logo.PNG" alt="The Community Room" class="nav-logo-img" />
     </a>
     <ul class="nav-links">
       <li><a href="index.html">Home</a></li>
       <li><a href="about.html" class="active">About</a></li>
+      <li><a href="book.html">Book an Event</a></li>
       <li><a href="cart-services.html">Cart Services</a></li>
-      <li><a href="book.html">Book With Us!</a></li>
       <li><a href="events.html">Events</a></li>
     </ul>
-
-    <button class="nav-search" aria-label="Search">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
-      </svg>
-    </button>
   </nav>
 
   <!-- ABOUT SPLIT SECTION -->
@@ -38,9 +32,9 @@
 
     <!-- Right: text -->
     <div class="about-split-text">
-      <h2>Welcome To Our Collective!</h2>
+      <h2>Welcome To Our Community!</h2>
 
-      <p><strong><em>We are The Urban Collective</em></strong> — a Studio, Café, and Event Space created to foster creativity, connection, and community.</p>
+      <p><strong><em>We are The Community Room</em></strong> — a Studio, Café, and Event Space created to foster creativity, connection, and community.</p>
 
       <p>Rooted in the belief that spaces shape experiences, we designed this environment to feel warm, inspiring, and effortlessly social. It's a place where you can meet, create, host, and unwind all in one.</p>
 
@@ -52,26 +46,46 @@
     </div>
   </div>
 
+  <!-- PHOTO SCROLL -->
+  <div class="about-photo-scroll">
+    <div class="about-photo-track">
+      <div class="about-photo-item img-placeholder" style="background:linear-gradient(135deg,#e8e4dc,#c9c4b8);">[ Photo 1 ]</div>
+      <div class="about-photo-item img-placeholder" style="background:linear-gradient(135deg,#d4cfc6,#b8b2a6);">[ Photo 2 ]</div>
+      <div class="about-photo-item img-placeholder" style="background:linear-gradient(135deg,#ccc7bc,#a8a398);">[ Photo 3 ]</div>
+      <div class="about-photo-item img-placeholder" style="background:linear-gradient(135deg,#e2ddd4,#c4bfb4);">[ Photo 4 ]</div>
+      <div class="about-photo-item img-placeholder" style="background:linear-gradient(135deg,#d8d3ca,#bcb7ac);">[ Photo 5 ]</div>
+    </div>
+  </div>
+
   <!-- COLLAB BAND -->
   <section class="collab-band">
     <div class="collab-band-inner">
-      <h2>Collab With US!</h2>
-      <p>Looking to Host, Collaborate, or Create in Our Studio?</p>
-      <p class="inquire-label">Inquire About:</p>
-      <ul>
-        <li>Event Bookings</li>
-        <li>Studio Rentals</li>
-        <li>Café Mobile Service (Sweet Mondays)</li>
-        <li>Brand Partnerships</li>
-      </ul>
-      <a href="book.html" class="btn-outline">Book With Us!</a>
+      <div class="collab-band-text">
+        <h2>Collab With US!</h2>
+        <p>Looking to Host, Collaborate, or Create in Our Studio?</p>
+        <p class="inquire-label">Inquire About:</p>
+        <ul>
+          <li>Event Bookings</li>
+          <li>Studio Rentals</li>
+          <li>Café Mobile Service (Sweet Mondays)</li>
+          <li>Brand Partnerships</li>
+        </ul>
+        <a href="book.html" class="btn-outline">Book an Event</a>
+      </div>
+      <div class="collab-band-side">
+        <div class="collab-band-side-inner">
+          <span class="collab-side-label">Ready to get started?</span>
+          <p class="collab-side-text">Whether it's an intimate gathering or a full studio takeover — we'd love to hear what you're envisioning.</p>
+          <a href="book.html" class="btn-dark">Book an Event</a>
+        </div>
+      </div>
     </div>
   </section>
 
   <!-- FOOTER -->
   <footer>
     <div class="footer-inner">
-      <span class="footer-brand">The Urban Collective</span>
+      <span class="footer-brand">The Community Room</span>
       <div class="footer-icons">
         <!-- Email -->
         <a href="mailto:" class="footer-icon footer-icon-email" aria-label="Email">
@@ -90,5 +104,6 @@
     <div class="footer-copy">© 2026</div>
   </footer>
 
+  <script src="chat-agent.js"></script>
 </body>
 </html>
