@@ -29,13 +29,16 @@
       <a href="index.html" class="nav-logo">
         <img src="logo.PNG" alt="The Community Room" class="nav-logo-img" />
       </a>
-      <ul class="nav-links">
+      <ul class="nav-links" id="navLinks">
         <li><a href="index.html">Home</a></li>
         <li><a href="events.html">Events</a></li>
         <li><a href="book.html">Book an Event</a></li>
         <li><a href="admin.html" class="active">Admin</a></li>
       </ul>
       <button class="adm-logout-btn" id="admLogout">Log Out</button>
+      <button class="nav-hamburger" id="navHamburger" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
     </nav>
 
     <div class="adm-page">
@@ -355,6 +358,7 @@
       setTimeout(() => { toast.classList.remove('adm-toast-show'); setTimeout(() => toast.remove(), 300); }, 4000);
     }
   </script>
+  <script src="nav.js"></script>
 
 </body>
 </html>

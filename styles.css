@@ -28,9 +28,9 @@ nav {
   z-index: 100;
   background: var(--black);
   display: grid;
-  grid-template-columns: auto 1fr;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  padding: 0 32px;
+  padding: 0 20px 0 16px;
   height: 72px;
 }
 
@@ -1317,10 +1317,69 @@ footer {
   .bk-catering-grid { grid-template-columns: 1fr; }
 }
 
+/* ── HAMBURGER BUTTON (hidden on desktop) ── */
+.nav-hamburger {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  margin-left: 12px;
+}
+
+.nav-hamburger span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--white);
+  border-radius: 2px;
+  transition: transform 0.25s, opacity 0.25s;
+}
+
+/* Animate to X when open */
+.nav-hamburger-active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.nav-hamburger-active span:nth-child(2) { opacity: 0; }
+.nav-hamburger-active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
 @media (max-width: 600px) {
-  .nav-links { gap: 18px; }
-  .nav-links a { font-size: 11px; }
-  .gallery { padding: 24px 16px 40px; }
+  nav {
+    grid-template-columns: auto 1fr auto;
+    padding: 0 16px 0 12px;
+    flex-wrap: wrap;
+  }
+
+  .nav-hamburger { display: flex; }
+
+  .nav-links {
+    display: none;
+    position: absolute;
+    top: 72px;
+    left: 0;
+    right: 0;
+    background: var(--black);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+    padding: 8px 0 16px;
+    z-index: 99;
+    border-top: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .nav-links.nav-open { display: flex; }
+
+  .nav-links li { width: 100%; }
+
+  .nav-links a {
+    display: block;
+    padding: 14px 24px;
+    font-size: 13px;
+    width: 100%;
+  }
+
+  .nav-links a::after { display: none; }
 }
 
 /* ── EVENTS PAGE ── */

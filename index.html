@@ -14,13 +14,16 @@
     <a href="index.html" class="nav-logo">
       <img src="logo.PNG" alt="The Community Room" class="nav-logo-img" />
     </a>
-    <ul class="nav-links">
+    <ul class="nav-links" id="navLinks">
       <li><a href="index.html" class="active">Home</a></li>
       <li><a href="about.html">About</a></li>
       <li><a href="book.html">Book an Event</a></li>
       <li><a href="cart-services.html">Cart Services</a></li>
       <li><a href="events.html">Events</a></li>
     </ul>
+    <button class="nav-hamburger" id="navHamburger" aria-label="Toggle menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
   </nav>
 
   <!-- HERO -->
@@ -66,19 +69,6 @@
 
   </div>
 
-  <!-- GALLERY -->
-  <div class="gallery">
-    <div class="gallery-item">
-      <div class="img-placeholder" style="background:linear-gradient(135deg,#a8c070,#7a9e4a);">[ Photo 1 ]</div>
-    </div>
-    <div class="gallery-item">
-      <div class="img-placeholder" style="background:linear-gradient(135deg,#8ab04a,#5c8030);">[ Photo 2 ]</div>
-    </div>
-    <div class="gallery-item">
-      <div class="img-placeholder" style="background:linear-gradient(135deg,#96b855,#6a9038);">[ Photo 3 ]</div>
-    </div>
-  </div>
-
   <!-- FOOTER -->
   <footer>
     <div class="footer-inner">
@@ -102,5 +92,6 @@
   </footer>
 
   <script src="chat-agent.js"></script>
+  <script src="nav.js"></script>
 </body>
 </html>

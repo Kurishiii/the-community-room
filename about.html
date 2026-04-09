@@ -14,13 +14,16 @@
     <a href="index.html" class="nav-logo">
       <img src="logo.PNG" alt="The Community Room" class="nav-logo-img" />
     </a>
-    <ul class="nav-links">
+    <ul class="nav-links" id="navLinks">
       <li><a href="index.html">Home</a></li>
       <li><a href="about.html" class="active">About</a></li>
       <li><a href="book.html">Book an Event</a></li>
       <li><a href="cart-services.html">Cart Services</a></li>
       <li><a href="events.html">Events</a></li>
     </ul>
+    <button class="nav-hamburger" id="navHamburger" aria-label="Toggle menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
   </nav>
 
   <!-- ABOUT SPLIT SECTION -->
@@ -113,6 +116,7 @@
   </footer>
 
   <script src="chat-agent.js"></script>
+  <script src="nav.js"></script>
   <script>
     const slides = document.querySelectorAll('.collab-slide');
     const dotsWrap = document.getElementById('slideDots');
