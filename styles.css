@@ -1888,4 +1888,67 @@ footer {
   padding: 0;
   transition: background 0.2s;
 }
+
+/* ── MEET THE OWNER SECTION ── */
+.meet-owner-section {
+  background: var(--off-white, #f8f6f2);
+  padding: 72px 40px;
+}
+
+.meet-owner-inner {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.meet-owner-inner h2 {
+  font-size: clamp(20px, 3vw, 26px);
+  font-weight: 700;
+  color: var(--black-warm);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 28px;
+}
+
+.meet-owner-inner p {
+  font-size: 15px;
+  color: var(--mid-gray);
+  line-height: 1.85;
+  margin-bottom: 18px;
+}
+
+.owner-quote {
+  margin: 32px 0 0;
+  padding: 20px 24px;
+  border-left: 3px solid var(--black-warm, #1a1a1a);
+  font-size: 15px;
+  font-style: italic;
+  color: var(--dark, #2a2a2a);
+  line-height: 1.75;
+  background: rgba(0,0,0,0.03);
+  border-radius: 0 4px 4px 0;
+}
+
+/* ── BOOKING FORM RADIO GROUPS ── */
+.bk-radio-group {
+  display: flex;
+  gap: 24px;
+  margin-top: 8px;
+}
+
+.bk-radio-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--dark);
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.bk-radio-label input[type="radio"] {
+  accent-color: var(--black-warm, #1a1a1a);
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
 .collab-dot-active { background: #fff; }

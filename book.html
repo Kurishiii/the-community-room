@@ -352,34 +352,18 @@
       overlay.removeAttribute('aria-hidden');
       document.body.style.overflow = 'hidden';
 
-      // Slot card interaction
-      document.querySelectorAll('.bk-slot-card:not(.bk-slot-taken)').forEach(card => {
-        card.addEventListener('click', () => {
-          document.querySelectorAll('.bk-slot-card').forEach(c => c.classList.remove('bk-slot-selected'));
-          card.classList.add('bk-slot-selected');
-          selectedSlot = card.dataset.slot;
-          document.getElementById('slotError').hidden = true;
-        });
-      });
-
-      // Catering card interaction
-      document.querySelectorAll('.bk-catering-card').forEach(card => {
-        card.addEventListener('click', () => {
-          document.querySelectorAll('.bk-catering-card').forEach(c => c.classList.remove('bk-catering-selected'));
-          card.classList.add('bk-catering-selected');
-          selectedCatering = card.dataset.catering;
-        });
-      });
-
-      // Default: first catering option pre-selected
-      const firstCat = document.querySelector('.bk-catering-card');
-      if (firstCat) firstCat.classList.add('bk-catering-selected');
-
       // "Other" event type reveals a description textarea
       const etypeSelect = document.getElementById('etype');
       const otherWrap   = document.getElementById('otherEventWrap');
       etypeSelect.addEventListener('change', () => {
         otherWrap.hidden = etypeSelect.value !== 'Other';
+      });
+
+      // Collab yes/no reveals options
+      document.querySelectorAll('input[name="collab"]').forEach(radio => {
+        radio.addEventListener('change', () => {
+          document.getElementById('collabOptionsWrap').hidden = radio.value !== 'yes';
+        });
       });
 
       // Form submit
@@ -401,28 +385,6 @@
     // ─────────────────────────────────────────────
 
     function buildForm(title, availableSlots) {
-      // Build slot cards
-      const slotCards = ALL_SLOTS.map(slot => {
-        // full_day unavailable if any individual slot is already booked on this day
-        const unavailable = !availableSlots.includes(slot);
-        const cls = unavailable ? 'bk-slot-card bk-slot-taken' : 'bk-slot-card';
-        return `
-          <div class="${cls}" data-slot="${slot}">
-            <span class="bk-slot-label">${SLOT_INFO[slot].label}</span>
-            <span class="bk-slot-time">${SLOT_INFO[slot].time}</span>
-            ${unavailable ? '<span class="bk-slot-unavail">Unavailable</span>' : ''}
-          </div>`;
-      }).join('');
-
-      // Build catering cards
-      const cateringCards = CATERING_OPTIONS.map(c => `
-        <div class="bk-catering-card" data-catering="${c.id}">
-          ${c.popular ? '<span class="bk-popular-badge">Most popular</span>' : ''}
-          <span class="bk-catering-label">${c.label}</span>
-          <span class="bk-catering-sub">${c.sub}</span>
-        </div>`
-      ).join('');
-
       // Build event type options
       const typeOptions = EVENT_TYPES.map(t =>
         `<option value="${t}">${t}</option>`
@@ -469,16 +431,50 @@
             <input class="bk-input" type="number" id="guests" name="guests" min="1" max="500" placeholder="e.g. 30" />
           </div>
 
-          <div class="bk-section-label">Time Slot <span class="bk-req">*</span></div>
-          <div class="bk-slot-grid">${slotCards}</div>
-          <div class="bk-error" id="slotError" hidden>Please select an available time slot.</div>
+          <div class="bk-field">
+            <label class="bk-label" for="setup">What kind of setup do you need? <span class="bk-req">*</span></label>
+            <select class="bk-input bk-select" id="setup" name="setup">
+              <option value="">Select setup type…</option>
+              <option value="open_mingling">Open Mingling</option>
+              <option value="tables_chairs">Tables/Chairs</option>
+              <option value="vendor_booths">Vendor Booths</option>
+              <option value="stage_area">Stage Area</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
 
-          <div class="bk-section-label" style="margin-top: 24px;">Catering Add-On</div>
-          <div class="bk-catering-grid">${cateringCards}</div>
+          <div class="bk-field" style="margin-top: 16px;">
+            <label class="bk-label">Are you interested in collaboration opportunities or community-based pricing?</label>
+            <div class="bk-radio-group">
+              <label class="bk-radio-label"><input type="radio" name="collab" value="yes" /> Yes</label>
+              <label class="bk-radio-label"><input type="radio" name="collab" value="no" /> No</label>
+            </div>
+          </div>
 
-          <div class="bk-field" style="margin-top: 20px;">
+          <div id="collabOptionsWrap" hidden>
+            <div class="bk-field">
+              <label class="bk-label" for="collabType">Select collaboration type</label>
+              <select class="bk-input bk-select" id="collabType" name="collabType">
+                <option value="">Select an option…</option>
+                <option value="co_hosted">Co-Hosted Events</option>
+                <option value="ticket_splits">Ticket Splits</option>
+                <option value="nonprofit_rates">Nonprofit Rates</option>
+                <option value="vendor_partnerships">Vendor Partnerships</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="bk-field" style="margin-top: 16px;">
             <label class="bk-label" for="notes">Additional Notes</label>
             <textarea class="bk-input bk-textarea" id="notes" name="notes" placeholder="Any special requests or details about your event…"></textarea>
+          </div>
+
+          <div class="bk-field" style="margin-top: 16px;">
+            <label class="bk-label">Are you interested in adding any café or beverage services (coffee/matcha bar)?</label>
+            <div class="bk-radio-group">
+              <label class="bk-radio-label"><input type="radio" name="cafe" value="yes" /> Yes</label>
+              <label class="bk-radio-label"><input type="radio" name="cafe" value="no" /> No</label>
+            </div>
           </div>
 
           <div class="bk-error" id="formError" hidden>Please fill in all required fields marked with *</div>
@@ -497,34 +493,21 @@
       const fname  = form.fname.value.trim();
       const etype  = form.etype.value;
       const guests = form.guests.value.trim();
+      const setup  = form.setup.value;
 
       const formError = document.getElementById('formError');
-      const slotError = document.getElementById('slotError');
       formError.hidden = true;
-      slotError.hidden = true;
 
-      let valid = true;
-      if (!fname || !etype || !guests) {
+      if (!fname || !etype || !guests || !setup) {
         formError.hidden = false;
-        valid = false;
+        return;
       }
-      if (!selectedSlot) {
-        slotError.hidden = false;
-        valid = false;
-      }
-      if (!valid) return;
-
-      const cateringLabel = CATERING_LABELS[selectedCatering] || 'No catering';
 
       document.getElementById('modalContent').innerHTML = `
         <div class="bk-confirm">
           <div class="bk-confirm-icon">✓</div>
           <h2 class="bk-confirm-title">Request received!</h2>
           <p class="bk-confirm-msg">We'll be in touch within 24 hours.</p>
-          <div class="bk-confirm-detail">
-            <span>Catering selection:</span>
-            <strong>${cateringLabel}</strong>
-          </div>
           <button class="bk-submit bk-submit-outline" onclick="closeModal()" style="margin-top: 28px;">Close</button>
         </div>`;
     }
