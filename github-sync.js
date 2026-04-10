@@ -11,7 +11,9 @@
 // NOTE: This token only allows editing files in this one repo.
 // ─────────────────────────────────────────────────────────────
 
-const GITHUB_TOKEN = 'PASTE_YOUR_TOKEN_HERE';
+// Token is entered by the admin at login and stored in sessionStorage only.
+// It is never saved to disk or committed to the repo.
+const GITHUB_TOKEN = sessionStorage.getItem('adm_gh_token') || '';
 const GITHUB_REPO  = 'Kurishiii/the-community-room';
 const DATA_FILE    = 'events-data.json';
 const API_BASE     = `https://api.github.com/repos/${GITHUB_REPO}/contents/${DATA_FILE}`;

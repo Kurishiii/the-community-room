@@ -16,6 +16,8 @@
       <h2>Admin Access</h2>
       <p>Enter your password to continue</p>
       <input type="password" class="bk-input" id="admPassword" placeholder="Password" />
+      <p style="margin-top:16px;font-size:13px;color:#666;">GitHub Token <span style="font-size:11px;color:#999;">(for cross-device sync)</span></p>
+      <input type="password" class="bk-input" id="admGhToken" placeholder="ghp_…  (paste your token)" autocomplete="off" />
       <div class="adm-gate-error" id="admGateError" hidden>Incorrect password.</div>
       <button class="bk-submit" id="admLoginBtn">Enter</button>
     </div>
@@ -177,10 +179,12 @@
 
     // ── AUTH ──
     function tryLogin() {
-      const val = document.getElementById('admPassword').value;
-      const err = document.getElementById('admGateError');
+      const val   = document.getElementById('admPassword').value;
+      const token = document.getElementById('admGhToken').value.trim();
+      const err   = document.getElementById('admGateError');
       if (val === ADM_PASSWORD) {
         sessionStorage.setItem('adm_auth', '1');
+        if (token) sessionStorage.setItem('adm_gh_token', token);
         document.getElementById('admGate').style.display = 'none';
         document.getElementById('admContent').style.display = 'block';
         loadAndRender();
@@ -202,6 +206,7 @@
 
     document.getElementById('admLogout').onclick = function() {
       sessionStorage.removeItem('adm_auth');
+      sessionStorage.removeItem('adm_gh_token');
       document.getElementById('admGate').style.display = 'flex';
       document.getElementById('admContent').style.display = 'none';
     };
