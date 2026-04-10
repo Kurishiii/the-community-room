@@ -162,10 +162,9 @@
 
   </div>
 
+  <script src="github-sync.js"></script>
   <script>
     const ADM_PASSWORD = 'password123';
-    const CAL_KEY = 'uc_owner_events';
-    const EV_KEY  = 'uc_events_page';
 
     const CATEGORY_COLORS = {
       music:     'linear-gradient(160deg, #1a1a2e 0%, #4a3060 100%)',
@@ -173,6 +172,8 @@
       arts:      'linear-gradient(160deg, #1e3a2f 0%, #2d6a4f 100%)',
       wellness:  'linear-gradient(160deg, #2e1a1a 0%, #7a3b3b 100%)',
     };
+
+    let currentSha = '';
 
     // ── AUTH ──
     function tryLogin() {
@@ -182,8 +183,7 @@
         sessionStorage.setItem('adm_auth', '1');
         document.getElementById('admGate').style.display = 'none';
         document.getElementById('admContent').style.display = 'block';
-        renderCalList();
-        renderEvList();
+        loadAndRender();
       } else {
         err.hidden = false;
       }
@@ -197,8 +197,7 @@
     if (sessionStorage.getItem('adm_auth') === '1') {
       document.getElementById('admGate').style.display = 'none';
       document.getElementById('admContent').style.display = 'block';
-      renderCalList();
-      renderEvList();
+      loadAndRender();
     }
 
     document.getElementById('admLogout').onclick = function() {
@@ -206,6 +205,13 @@
       document.getElementById('admGate').style.display = 'flex';
       document.getElementById('admContent').style.display = 'none';
     };
+
+    async function loadAndRender() {
+      const { data, sha } = await githubReadData();
+      currentSha = sha;
+      renderCalList(data.calendar_events || {});
+      renderEvList(data.page_events || []);
+    }
 
     // ── TABS ──
     document.querySelectorAll('.adm-tab').forEach(tab => {
@@ -216,12 +222,6 @@
         document.getElementById('tab-' + tab.dataset.tab).classList.remove('adm-panel-hidden');
       });
     });
-
-    // ── HELPERS ──
-    function getCalEvents() { return JSON.parse(localStorage.getItem(CAL_KEY) || '{}'); }
-    function getEvCards()   { return JSON.parse(localStorage.getItem(EV_KEY)  || '[]'); }
-    function saveCalEvents(d) { localStorage.setItem(CAL_KEY, JSON.stringify(d)); }
-    function saveEvCards(d)   { localStorage.setItem(EV_KEY,  JSON.stringify(d)); }
 
     function readFileAsBase64(file) {
       return new Promise((resolve) => {
@@ -248,8 +248,10 @@
       const flyerFile = document.getElementById('cal-flyer').files[0];
       const flyer     = await readFileAsBase64(flyerFile);
 
-      const events = getCalEvents();
-      events[date] = {
+      const { data, sha } = await githubReadData();
+      currentSha = sha;
+      data.calendar_events = data.calendar_events || {};
+      data.calendar_events[date] = {
         name,
         tag:      document.getElementById('cal-tag').value.trim() || 'Event',
         date:     displayDate,
@@ -258,22 +260,25 @@
         desc:     document.getElementById('cal-desc').value.trim(),
         flyer,
       };
-      saveCalEvents(events);
+      const ok = await githubWriteData(data, currentSha);
+      if (ok) {
+        const { sha: newSha } = await githubReadData();
+        currentSha = newSha;
+      }
       e.target.reset();
-      renderCalList();
-      showToast('Calendar event added! <a href="book.html" target="_blank">View Calendar →</a>');
+      renderCalList(data.calendar_events);
+      showToast(ok
+        ? 'Calendar event saved! Visible on all devices. <a href="book.html" target="_blank">View Calendar →</a>'
+        : 'Saved locally only. Set up GitHub token for cross-device sync.');
     });
 
-    function renderCalList() {
-      const list   = document.getElementById('calList');
-      const events = getCalEvents();
-      const keys   = Object.keys(events);
-
+    function renderCalList(events) {
+      const list = document.getElementById('calList');
+      const keys = Object.keys(events || {});
       if (keys.length === 0) {
         list.innerHTML = '<p class="adm-empty">No events added yet.</p>';
         return;
       }
-
       list.innerHTML = keys.sort().map(key => `
         <div class="adm-list-item">
           <div class="adm-list-info">
@@ -285,11 +290,12 @@
       `).join('');
     }
 
-    function deleteCalEvent(key) {
-      const events = getCalEvents();
-      delete events[key];
-      saveCalEvents(events);
-      renderCalList();
+    async function deleteCalEvent(key) {
+      const { data, sha } = await githubReadData();
+      currentSha = sha;
+      delete data.calendar_events[key];
+      await githubWriteData(data, currentSha);
+      renderCalList(data.calendar_events);
     }
 
     // ── EVENTS PAGE FORM ──
@@ -308,23 +314,28 @@
       const flyerFile = document.getElementById('ev-flyer').files[0];
       const flyer     = await readFileAsBase64(flyerFile);
 
-      const cards = getEvCards();
-      cards.push({ name, date, category, flyer, id: Date.now() });
-      saveEvCards(cards);
+      const { data, sha } = await githubReadData();
+      currentSha = sha;
+      data.page_events = data.page_events || [];
+      data.page_events.push({ name, date, category, flyer, id: Date.now() });
+      const ok = await githubWriteData(data, currentSha);
+      if (ok) {
+        const { sha: newSha } = await githubReadData();
+        currentSha = newSha;
+      }
       e.target.reset();
-      renderEvList();
-      showToast('Event card added! <a href="events.html" target="_blank">View Events Page →</a>');
+      renderEvList(data.page_events);
+      showToast(ok
+        ? 'Event card saved! Visible on all devices. <a href="events.html" target="_blank">View Events →</a>'
+        : 'Saved locally only. Set up GitHub token for cross-device sync.');
     });
 
-    function renderEvList() {
-      const list  = document.getElementById('evList');
-      const cards = getEvCards();
-
-      if (cards.length === 0) {
+    function renderEvList(cards) {
+      const list = document.getElementById('evList');
+      if (!cards || cards.length === 0) {
         list.innerHTML = '<p class="adm-empty">No event cards added yet.</p>';
         return;
       }
-
       list.innerHTML = cards.map(card => `
         <div class="adm-list-item">
           ${card.flyer
@@ -340,10 +351,12 @@
       `).join('');
     }
 
-    function deleteEvCard(id) {
-      const cards = getEvCards().filter(c => c.id !== id);
-      saveEvCards(cards);
-      renderEvList();
+    async function deleteEvCard(id) {
+      const { data, sha } = await githubReadData();
+      currentSha = sha;
+      data.page_events = (data.page_events || []).filter(c => c.id !== id);
+      await githubWriteData(data, currentSha);
+      renderEvList(data.page_events);
     }
 
     function showToast(msg) {

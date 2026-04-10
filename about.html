@@ -79,15 +79,14 @@
         <a href="book.html" class="btn-outline">Book an Event</a>
       </div>
       <div class="collab-band-side">
-        <div class="collab-slideshow" id="collabSlideshow">
-          <div class="collab-slide active" style="background:linear-gradient(135deg,#e8e4dc,#c9c4b8);">[ Photo 1 ]</div>
-          <div class="collab-slide" style="background:linear-gradient(135deg,#d4cfc6,#b8b2a6);">[ Photo 2 ]</div>
-          <div class="collab-slide" style="background:linear-gradient(135deg,#ccc7bc,#a8a398);">[ Photo 3 ]</div>
-          <div class="collab-slide" style="background:linear-gradient(135deg,#e2ddd4,#c4bfb4);">[ Photo 4 ]</div>
-          <div class="collab-slide" style="background:linear-gradient(135deg,#d8d3ca,#bcb7ac);">[ Photo 5 ]</div>
-          <button class="collab-slide-prev" id="slidePrev" aria-label="Previous">&#8249;</button>
-          <button class="collab-slide-next" id="slideNext" aria-label="Next">&#8250;</button>
-          <div class="collab-slide-dots" id="slideDots"></div>
+        <div class="collab-hscroll">
+          <div class="collab-hscroll-track">
+            <div class="collab-hscroll-item" style="background:linear-gradient(135deg,#e8e4dc,#c9c4b8);">[ Photo 1 ]</div>
+            <div class="collab-hscroll-item" style="background:linear-gradient(135deg,#d4cfc6,#b8b2a6);">[ Photo 2 ]</div>
+            <div class="collab-hscroll-item" style="background:linear-gradient(135deg,#ccc7bc,#a8a398);">[ Photo 3 ]</div>
+            <div class="collab-hscroll-item" style="background:linear-gradient(135deg,#e2ddd4,#c4bfb4);">[ Photo 4 ]</div>
+            <div class="collab-hscroll-item" style="background:linear-gradient(135deg,#d8d3ca,#bcb7ac);">[ Photo 5 ]</div>
+          </div>
         </div>
       </div>
     </div>
@@ -117,30 +116,5 @@
 
   <script src="chat-agent.js"></script>
   <script src="nav.js"></script>
-  <script>
-    const slides = document.querySelectorAll('.collab-slide');
-    const dotsWrap = document.getElementById('slideDots');
-    let current = 0;
-
-    slides.forEach((_, i) => {
-      const dot = document.createElement('button');
-      dot.className = 'collab-dot' + (i === 0 ? ' collab-dot-active' : '');
-      dot.setAttribute('aria-label', 'Go to slide ' + (i + 1));
-      dot.addEventListener('click', () => goTo(i));
-      dotsWrap.appendChild(dot);
-    });
-
-    function goTo(n) {
-      slides[current].classList.remove('active');
-      dotsWrap.children[current].classList.remove('collab-dot-active');
-      current = (n + slides.length) % slides.length;
-      slides[current].classList.add('active');
-      dotsWrap.children[current].classList.add('collab-dot-active');
-    }
-
-    document.getElementById('slidePrev').addEventListener('click', () => goTo(current - 1));
-    document.getElementById('slideNext').addEventListener('click', () => goTo(current + 1));
-    setInterval(() => goTo(current + 1), 4000);
-  </script>
 </body>
 </html>

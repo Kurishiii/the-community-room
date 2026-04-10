@@ -97,6 +97,7 @@
     <div class="footer-copy">© 2026</div>
   </footer>
 
+  <script src="github-sync.js"></script>
   <script>
     // ─────────────────────────────────────────────
     // DATA — Edit these to manage your calendar
@@ -135,12 +136,13 @@
       },
     };
 
-    // Merge admin-added events from localStorage
-    Object.assign(OWNER_EVENTS, JSON.parse(localStorage.getItem('uc_owner_events') || '{}'));
-
-    // Reload calendar if admin updates events in another tab
-    window.addEventListener('storage', e => {
-      if (e.key === 'uc_owner_events') location.reload();
+    // Merge admin-added events from GitHub (cross-device) then re-render
+    githubReadData().then(({ data }) => {
+      const adminEvents = data.calendar_events || {};
+      if (Object.keys(adminEvents).length > 0) {
+        Object.assign(OWNER_EVENTS, adminEvents);
+        renderCalendar();
+      }
     });
 
     // CLIENT bookings: only "Private event" is ever shown — no details exposed
