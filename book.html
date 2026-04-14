@@ -517,18 +517,22 @@
       const collabRadio = form.querySelector('input[name="collab"]:checked');
       const cafeRadio   = form.querySelector('input[name="cafe"]:checked');
 
+      const collabValue = collabRadio && collabRadio.value === 'yes'
+        ? ('Yes' + (form.collabType && form.collabType.value ? ' — ' + form.collabType.options[form.collabType.selectedIndex].text : ''))
+        : (collabRadio ? 'No' : '');
+
       const fields = {
-        'Full Name':        fname,
-        'Email':            form.email.value.trim(),
-        'Phone':            form.phone.value.trim(),
-        'Event Type':       etype === 'Other' ? (form.otherEvent.value.trim() || 'Other') : etype,
-        'Guest Count':      parseInt(guests, 10),
-        'Setup Type':       setup,
-        'Collaboration':    collabRadio ? collabRadio.value : '',
-        'Collaboration Type': form.collabType ? form.collabType.value : '',
-        'Café Services':    cafeRadio ? cafeRadio.value : '',
-        'Notes':            form.notes.value.trim(),
-        'Requested Date':   selectedDate || '',
+        'Full Name':              fname,
+        'Email':                  form.email.value.trim(),
+        'Phone Number':           form.phone.value.trim(),
+        'Event Type':             etype === 'Other' ? (form.otherEvent.value.trim() || 'Other') : etype,
+        'Est. Guest Count':       parseInt(guests, 10),
+        'Setup Type':             setup,
+        'Matcha Cart Interest':   cafeRadio ? (cafeRadio.value === 'yes' ? 'Yes' : 'No') : '',
+        'Collaboration Interest': collabValue,
+        'Additional Notes':       form.notes.value.trim(),
+        'Event Date':             selectedDate || '',
+        'Status':                 'Pending',
       };
 
       try {
