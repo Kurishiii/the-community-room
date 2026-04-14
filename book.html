@@ -344,10 +344,12 @@
     const overlay = document.getElementById('overlay');
     let selectedSlot     = null;
     let selectedCatering = 'none';
+    let selectedDate     = null;
 
     function openModal(key, day, availableSlots) {
       selectedSlot     = null;
       selectedCatering = 'offsite';
+      selectedDate     = key;
 
       const [y, m] = key.split('-');
       const title  = `${MONTH_NAMES[parseInt(m, 10) - 1]} ${day}, ${y}`;
@@ -492,7 +494,7 @@
     // SUBMIT HANDLER
     // ─────────────────────────────────────────────
 
-    function handleSubmit(e) {
+    async function handleSubmit(e) {
       e.preventDefault();
       const form   = e.target;
       const fname  = form.fname.value.trim();
@@ -508,13 +510,59 @@
         return;
       }
 
-      document.getElementById('modalContent').innerHTML = `
-        <div class="bk-confirm">
-          <div class="bk-confirm-icon">✓</div>
-          <h2 class="bk-confirm-title">Request received!</h2>
-          <p class="bk-confirm-msg">We'll be in touch within 24 hours.</p>
-          <button class="bk-submit bk-submit-outline" onclick="closeModal()" style="margin-top: 28px;">Close</button>
-        </div>`;
+      const submitBtn = form.querySelector('button[type="submit"]');
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Sending…';
+
+      const collabRadio = form.querySelector('input[name="collab"]:checked');
+      const cafeRadio   = form.querySelector('input[name="cafe"]:checked');
+
+      const fields = {
+        'Full Name':        fname,
+        'Email':            form.email.value.trim(),
+        'Phone':            form.phone.value.trim(),
+        'Event Type':       etype === 'Other' ? (form.otherEvent.value.trim() || 'Other') : etype,
+        'Guest Count':      parseInt(guests, 10),
+        'Setup Type':       setup,
+        'Collaboration':    collabRadio ? collabRadio.value : '',
+        'Collaboration Type': form.collabType ? form.collabType.value : '',
+        'Café Services':    cafeRadio ? cafeRadio.value : '',
+        'Notes':            form.notes.value.trim(),
+        'Requested Date':   selectedDate || '',
+      };
+
+      try {
+        const res = await fetch(
+          'https://api.airtable.com/v0/appooGUL6JfnCssS2/Booking%20Requests',
+          {
+            method: 'POST',
+            headers: {
+              'Authorization': 'Bearer patsN926w1ViQdlV0',
+              'Content-Type':  'application/json',
+            },
+            body: JSON.stringify({ fields }),
+          }
+        );
+
+        if (!res.ok) {
+          const err = await res.json();
+          console.error('Airtable error:', err);
+          throw new Error('Airtable error');
+        }
+
+        document.getElementById('modalContent').innerHTML = `
+          <div class="bk-confirm">
+            <div class="bk-confirm-icon">✓</div>
+            <h2 class="bk-confirm-title">Request received!</h2>
+            <p class="bk-confirm-msg">We'll be in touch within 24 hours.</p>
+            <button class="bk-submit bk-submit-outline" onclick="closeModal()" style="margin-top: 28px;">Close</button>
+          </div>`;
+      } catch (err) {
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Send Request';
+        formError.textContent = 'Something went wrong. Please try again or email us directly.';
+        formError.hidden = false;
+      }
     }
 
     // ─────────────────────────────────────────────
