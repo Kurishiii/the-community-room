@@ -99,54 +99,14 @@
 
   <script src="github-sync.js"></script>
   <script>
-    const AIRTABLE_TOKEN = 'patsN926w1ViQdlV0.eded10db84d9ffd70597d291a014d616fbb0f9c3803bd4cd19a938158f8d574d';
-    const AIRTABLE_BASE  = 'https://api.airtable.com/v0/appooGUL6JfnCssS2/Booking%20Requests';
+    const AIRTABLE_TOKEN        = 'patsN926w1ViQdlV0.eded10db84d9ffd70597d291a014d616fbb0f9c3803bd4cd19a938158f8d574d';
+    const AIRTABLE_BOOKINGS_URL = 'https://api.airtable.com/v0/appooGUL6JfnCssS2/Booking%20Requests';
+    const AIRTABLE_EVENTS_URL   = 'https://api.airtable.com/v0/appooGUL6JfnCssS2/Events%20%26%20Flyers';
 
     // ─────────────────────────────────────────────
-    // DATA — Edit these to manage your calendar
+    // DATA — populated from Airtable on page load
     // ─────────────────────────────────────────────
-
-    // YOUR events: full details shown publicly on the calendar.
-    // Add a 'flyer' path (e.g. 'images/flyer-brunch.jpg') once you have the image files.
-    // Leave flyer as null to show a styled placeholder instead.
-    const OWNER_EVENTS = {
-      '2026-04-10': {
-        name:    'Sweet Mondays Brunch',
-        tag:     'Community Event',
-        date:    'Friday, April 10 · 10am – 2pm',
-        location:'The Community Room Studio',
-        detail:  'Community event · Open to all',
-        desc:    'Join us for a laid-back brunch with Sweet Mondays handcrafted matcha and coffee. Open seating, good music, and great company. All are welcome — come as you are.',
-        flyer:   null,
-      },
-      '2026-04-18': {
-        name:    'Spring Market Pop-Up',
-        tag:     'Vendor Market',
-        date:    'Saturday, April 18 · Doors open 10am',
-        location:'The Community Room Studio',
-        detail:  'Vendor market · Doors open 10am',
-        desc:    'Shop local vendors, enjoy Sweet Mondays drinks, and connect with the community. From handmade goods to small-batch products — a curated market experience in the heart of the studio.',
-        flyer:   null,
-      },
-      '2026-05-03': {
-        name:    'Matcha & Music Night',
-        tag:     'Live Event',
-        date:    'Sunday, May 3 · 6pm – 10pm',
-        location:'The Community Room Studio',
-        detail:  'Live set · Open to all',
-        desc:    'An evening of live music and ceremonial grade matcha. Kick back in the lounge, sip something special, and enjoy local artists in an intimate setting. 21+ welcome.',
-        flyer:   null,
-      },
-    };
-
-    // Merge admin-added events from GitHub (cross-device) then re-render
-    githubReadData().then(({ data }) => {
-      const adminEvents = data.calendar_events || {};
-      if (Object.keys(adminEvents).length > 0) {
-        Object.assign(OWNER_EVENTS, adminEvents);
-        renderCalendar();
-      }
-    });
+    const OWNER_EVENTS = {};
 
     // CLIENT bookings: only "Private event" is ever shown — no details exposed
     // Slots: 'morning' (8am–12pm), 'afternoon' (12–5pm), 'evening' (5–10pm), 'full_day' (8am–10pm)
@@ -552,7 +512,7 @@
       );
 
       try {
-        const res = await fetch(AIRTABLE_BASE, {
+        const res = await fetch(AIRTABLE_BOOKINGS_URL, {
             method: 'POST',
             headers: {
               'Authorization': 'Bearer ' + AIRTABLE_TOKEN,
@@ -623,12 +583,48 @@
     }
 
     // ─────────────────────────────────────────────
+    // AIRTABLE OWNER EVENTS (Events & Flyers table)
+    // ─────────────────────────────────────────────
+
+    async function fetchOwnerEvents() {
+      try {
+        const filter = encodeURIComponent("{Show on Website}=1");
+        let records = [], offset = '';
+        do {
+          const url = AIRTABLE_EVENTS_URL + '?filterByFormula=' + filter + (offset ? '&offset=' + offset : '');
+          const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + AIRTABLE_TOKEN } });
+          if (!res.ok) throw new Error('fetch failed');
+          const json = await res.json();
+          records = records.concat(json.records);
+          offset = json.offset || '';
+        } while (offset);
+
+        records.forEach(record => {
+          const f       = record.fields;
+          const dateKey = f['Event Date'] ? f['Event Date'].slice(0, 10) : null;
+          if (!dateKey) return;
+          OWNER_EVENTS[dateKey] = {
+            name:     f['Event Name']    || 'Event',
+            tag:      f['Category']      || 'Event',
+            date:     f['Date and Time'] || '',
+            location: f['Location']      || 'The Community Room Studio',
+            detail:   f['Category']      || '',
+            desc:     f['Description']   || '',
+            flyer:    f['Flyer'] && f['Flyer'][0] ? f['Flyer'][0].url : null,
+          };
+        });
+      } catch(e) {
+        console.warn('Could not load owner events:', e.message);
+      }
+    }
+
+    // ─────────────────────────────────────────────
     // AIRTABLE CONFIRMED BOOKINGS
     // ─────────────────────────────────────────────
 
     async function fetchConfirmedBookings() {
       try {
-        const url = AIRTABLE_BASE
+        const url = AIRTABLE_BOOKINGS_URL
           + '?filterByFormula=' + encodeURIComponent("{Status}='Confirmed'")
           + '&fields%5B%5D=Event%20Date';
         const res = await fetch(url, {
@@ -648,7 +644,7 @@
     // ─────────────────────────────────────────────
     // INIT
     // ─────────────────────────────────────────────
-    fetchConfirmedBookings().then(() => renderCalendar());
+    Promise.all([fetchOwnerEvents(), fetchConfirmedBookings()]).then(() => renderCalendar());
   </script>
 
   <script src="chat-agent.js"></script>

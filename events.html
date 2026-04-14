@@ -42,63 +42,14 @@
   </div>
 
   <!-- EVENTS GRID -->
-  <div class="ev-grid" id="evGrid">
+  <div class="ev-grid" id="evGrid"></div>
 
-    <div class="ev-card" data-category="community">
-      <div class="ev-flyer" style="background: linear-gradient(160deg, #2d2d2d 0%, #5a4a3a 100%);">
-        <span class="ev-flyer-placeholder">Community</span>
-      </div>
-      <div class="ev-card-info">
-        <span class="ev-card-tag">Community</span>
-        <h3 class="ev-card-name">Sweet Mondays Brunch</h3>
-        <p class="ev-card-date">Friday, April 10 · 10am – 2pm</p>
-      </div>
+  <!-- EVENT MODAL -->
+  <div class="bk-overlay" id="evOverlay" aria-hidden="true">
+    <div class="bk-modal" role="dialog" aria-modal="true" aria-labelledby="evModalTitle">
+      <button class="bk-modal-close" id="evModalClose" aria-label="Close">✕</button>
+      <div id="evModalContent"></div>
     </div>
-
-    <div class="ev-card" data-category="music">
-      <div class="ev-flyer" style="background: linear-gradient(160deg, #1a1a2e 0%, #4a3060 100%);">
-        <span class="ev-flyer-placeholder">Music</span>
-      </div>
-      <div class="ev-card-info">
-        <span class="ev-card-tag">Music</span>
-        <h3 class="ev-card-name">Matcha & Music Night</h3>
-        <p class="ev-card-date">Sunday, May 3 · 6pm – 10pm</p>
-      </div>
-    </div>
-
-    <div class="ev-card" data-category="arts">
-      <div class="ev-flyer" style="background: linear-gradient(160deg, #1e3a2f 0%, #2d6a4f 100%);">
-        <span class="ev-flyer-placeholder">Arts</span>
-      </div>
-      <div class="ev-card-info">
-        <span class="ev-card-tag">Arts</span>
-        <h3 class="ev-card-name">Spring Market Pop-Up</h3>
-        <p class="ev-card-date">Saturday, April 18 · Doors open 10am</p>
-      </div>
-    </div>
-
-    <div class="ev-card" data-category="wellness">
-      <div class="ev-flyer" style="background: linear-gradient(160deg, #2e1a1a 0%, #7a3b3b 100%);">
-        <span class="ev-flyer-placeholder">Wellness</span>
-      </div>
-      <div class="ev-card-info">
-        <span class="ev-card-tag">Wellness</span>
-        <h3 class="ev-card-name">Morning Flow & Matcha</h3>
-        <p class="ev-card-date">Saturday, May 10 · 8am – 10am</p>
-      </div>
-    </div>
-
-    <div class="ev-card" data-category="community">
-      <div class="ev-flyer" style="background: linear-gradient(160deg, #1a2a3a 0%, #2a4a6a 100%);">
-        <span class="ev-flyer-placeholder">Community</span>
-      </div>
-      <div class="ev-card-info">
-        <span class="ev-card-tag">Community</span>
-        <h3 class="ev-card-name">Vendor Night</h3>
-        <p class="ev-card-date">Friday, May 22 · 5pm – 9pm</p>
-      </div>
-    </div>
-
   </div>
 
   <!-- FOOTER -->
@@ -121,8 +72,10 @@
     <div class="footer-copy">© 2026</div>
   </footer>
 
-  <script src="github-sync.js"></script>
   <script>
+    const AIRTABLE_TOKEN      = 'patsN926w1ViQdlV0.eded10db84d9ffd70597d291a014d616fbb0f9c3803bd4cd19a938158f8d574d';
+    const AIRTABLE_EVENTS_URL = 'https://api.airtable.com/v0/appooGUL6JfnCssS2/Events%20%26%20Flyers';
+
     const CATEGORY_COLORS = {
       music:     'linear-gradient(160deg, #1a1a2e 0%, #4a3060 100%)',
       community: 'linear-gradient(160deg, #2d2d2d 0%, #5a4a3a 100%)',
@@ -130,34 +83,109 @@
       wellness:  'linear-gradient(160deg, #2e1a1a 0%, #7a3b3b 100%)',
     };
 
-    const grid = document.getElementById('evGrid');
+    const grid    = document.getElementById('evGrid');
+    const overlay = document.getElementById('evOverlay');
 
-    function appendCard(card) {
-      const label = card.category.charAt(0).toUpperCase() + card.category.slice(1);
-      const flyerHTML = card.flyer
-        ? `<img src="${card.flyer}" alt="${card.name}" style="width:100%;height:100%;object-fit:cover;" />`
-        : `<span class="ev-flyer-placeholder">${label}</span>`;
-      const el = document.createElement('div');
-      el.className = 'ev-card';
-      el.dataset.category = card.category;
-      el.innerHTML = `
-        <div class="ev-flyer" style="background:${card.flyer ? '#111' : (CATEGORY_COLORS[card.category] || '#333')}">
-          ${flyerHTML}
-        </div>
-        <div class="ev-card-info">
-          <span class="ev-card-tag">${label}</span>
-          <h3 class="ev-card-name">${card.name}</h3>
-          <p class="ev-card-date">${card.date}</p>
-        </div>`;
-      grid.appendChild(el);
+    // ── FETCH & RENDER ──
+    async function loadEvents() {
+      try {
+        const filter = encodeURIComponent("{Show on Website}=1");
+        let records = [], offset = '';
+        do {
+          const url = AIRTABLE_EVENTS_URL + '?filterByFormula=' + filter + (offset ? '&offset=' + offset : '');
+          const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + AIRTABLE_TOKEN } });
+          if (!res.ok) throw new Error('fetch failed');
+          const json = await res.json();
+          records = records.concat(json.records);
+          offset = json.offset || '';
+        } while (offset);
+
+        grid.innerHTML = '';
+
+        if (records.length === 0) {
+          grid.innerHTML = '<p style="text-align:center;color:#888;padding:60px 20px;grid-column:1/-1;">No upcoming events at this time. Check back soon!</p>';
+          return;
+        }
+
+        records.forEach(record => {
+          const f        = record.fields;
+          const category = (f['Category'] || 'community').toLowerCase();
+          const name     = f['Event Name'] || '';
+          const date     = f['Date and Time'] || '';
+          const flyer    = f['Flyer'] && f['Flyer'][0] ? f['Flyer'][0].url : null;
+          const label    = f['Category'] || (category.charAt(0).toUpperCase() + category.slice(1));
+
+          const flyerHTML = flyer
+            ? `<img src="${flyer}" alt="${name}" style="width:100%;height:100%;object-fit:cover;" />`
+            : `<span class="ev-flyer-placeholder">${label}</span>`;
+
+          const el = document.createElement('div');
+          el.className = 'ev-card';
+          el.dataset.category = category;
+          el.style.cursor = 'pointer';
+          el.innerHTML = `
+            <div class="ev-flyer" style="background:${flyer ? '#111' : (CATEGORY_COLORS[category] || '#333')}">
+              ${flyerHTML}
+            </div>
+            <div class="ev-card-info">
+              <span class="ev-card-tag">${label}</span>
+              <h3 class="ev-card-name">${name}</h3>
+              <p class="ev-card-date">${date}</p>
+            </div>`;
+          el.addEventListener('click', () => openEvModal(record));
+          grid.appendChild(el);
+        });
+      } catch(e) {
+        console.warn('Could not load events:', e.message);
+      }
     }
 
-    // Load admin-added event cards from GitHub (falls back to localStorage cache)
-    githubReadData().then(({ data }) => {
-      (data.page_events || []).forEach(appendCard);
-    });
+    // ── MODAL ──
+    function openEvModal(record) {
+      const f     = record.fields;
+      const flyer = f['Flyer'] && f['Flyer'][0] ? f['Flyer'][0].url : null;
+      const label = f['Category'] || '';
 
-    // Filter logic
+      const flyerHTML = flyer
+        ? `<div class="bk-event-flyer"><img src="${flyer}" alt="${f['Event Name']} flyer" /></div>`
+        : `<div class="bk-event-flyer" style="background:#f0eef9;flex-direction:column;gap:6px;">
+             <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#534AB7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>
+             <span style="font-size:12px;color:#9490cc;font-weight:500;">Flyer coming soon</span>
+           </div>`;
+
+      document.getElementById('evModalContent').innerHTML = `
+        <h2 class="bk-modal-title" id="evModalTitle">${f['Event Name'] || ''}</h2>
+        ${flyerHTML}
+        <span class="bk-event-tag">${label}</span>
+        <div class="bk-event-meta">
+          <span class="bk-event-meta-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            ${f['Date and Time'] || ''}
+          </span>
+          <span class="bk-event-meta-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            ${f['Location'] || ''}
+          </span>
+        </div>
+        <p class="bk-event-desc">${f['Description'] || ''}</p>
+        <button class="bk-submit bk-submit-outline" onclick="closeEvModal()">Close</button>`;
+
+      overlay.classList.add('bk-overlay-active');
+      overlay.removeAttribute('aria-hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeEvModal() {
+      overlay.classList.remove('bk-overlay-active');
+      overlay.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    document.getElementById('evModalClose').addEventListener('click', closeEvModal);
+    overlay.addEventListener('click', e => { if (e.target === overlay) closeEvModal(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') closeEvModal(); });
+
+    // ── FILTERS ──
     document.querySelectorAll('.ev-filter-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         document.querySelectorAll('.ev-filter-btn').forEach(b => b.classList.remove('ev-filter-active'));
@@ -168,6 +196,8 @@
         });
       });
     });
+
+    loadEvents();
   </script>
 
   <script src="chat-agent.js"></script>
