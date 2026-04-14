@@ -550,7 +550,7 @@
 
         if (!res.ok) {
           const err = await res.json();
-          console.error('Airtable error:', err);
+          console.error('Airtable error:', JSON.stringify(err, null, 2));
           throw new Error('Airtable error');
         }
 
