@@ -521,12 +521,12 @@
         ? ('Yes' + (form.collabType && form.collabType.value ? ' — ' + form.collabType.options[form.collabType.selectedIndex].text : ''))
         : (collabRadio ? 'No' : '');
 
-      const fields = {
+      const rawFields = {
         'Full Name':              fname,
         'Email':                  form.email.value.trim(),
         'Phone Number':           form.phone.value.trim(),
         'Event Type':             etype === 'Other' ? (form.otherEvent.value.trim() || 'Other') : etype,
-        'Est. Guest Count':       parseInt(guests, 10),
+        'Est. Guest Count':       guests,
         'Setup Type':             setup,
         'Matcha Cart Interest':   cafeRadio ? (cafeRadio.value === 'yes' ? 'Yes' : 'No') : '',
         'Collaboration Interest': collabValue,
@@ -534,6 +534,11 @@
         'Event Date':             selectedDate || '',
         'Status':                 'Pending',
       };
+
+      // Strip empty fields so Airtable doesn't reject them
+      const fields = Object.fromEntries(
+        Object.entries(rawFields).filter(([, v]) => v !== '' && v !== null && v !== undefined)
+      );
 
       try {
         const res = await fetch(
