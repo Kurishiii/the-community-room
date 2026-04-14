@@ -575,6 +575,7 @@
             <p class="bk-confirm-msg">We'll be in touch within 24 hours.</p>
             <button class="bk-submit bk-submit-outline" onclick="closeModal()" style="margin-top: 28px;">Close</button>
           </div>`;
+        overlay.removeAttribute('aria-hidden');
       } catch (err) {
         submitBtn.disabled = false;
         submitBtn.textContent = 'Send Request';
