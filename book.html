@@ -99,6 +99,9 @@
 
   <script src="github-sync.js"></script>
   <script>
+    const AIRTABLE_TOKEN = 'patsN926w1ViQdlV0.eded10db84d9ffd70597d291a014d616fbb0f9c3803bd4cd19a938158f8d574d';
+    const AIRTABLE_BASE  = 'https://api.airtable.com/v0/appooGUL6JfnCssS2/Booking%20Requests';
+
     // ─────────────────────────────────────────────
     // DATA — Edit these to manage your calendar
     // ─────────────────────────────────────────────
@@ -549,12 +552,10 @@
       );
 
       try {
-        const res = await fetch(
-          'https://api.airtable.com/v0/appooGUL6JfnCssS2/Booking%20Requests',
-          {
+        const res = await fetch(AIRTABLE_BASE, {
             method: 'POST',
             headers: {
-              'Authorization': 'Bearer patsN926w1ViQdlV0.eded10db84d9ffd70597d291a014d616fbb0f9c3803bd4cd19a938158f8d574d',
+              'Authorization': 'Bearer ' + AIRTABLE_TOKEN,
               'Content-Type':  'application/json',
             },
             body: JSON.stringify({ fields }),
@@ -622,9 +623,32 @@
     }
 
     // ─────────────────────────────────────────────
+    // AIRTABLE CONFIRMED BOOKINGS
+    // ─────────────────────────────────────────────
+
+    async function fetchConfirmedBookings() {
+      try {
+        const url = AIRTABLE_BASE
+          + '?filterByFormula=' + encodeURIComponent("{Status}='Confirmed'")
+          + '&fields%5B%5D=Event%20Date';
+        const res = await fetch(url, {
+          headers: { 'Authorization': 'Bearer ' + AIRTABLE_TOKEN }
+        });
+        if (!res.ok) throw new Error('Airtable read failed');
+        const json = await res.json();
+        json.records.forEach(record => {
+          const date = record.fields['Event Date'];
+          if (date) CLIENT_BOOKINGS[date.slice(0, 10)] = ['full_day'];
+        });
+      } catch (e) {
+        console.warn('Could not load confirmed bookings:', e.message);
+      }
+    }
+
+    // ─────────────────────────────────────────────
     // INIT
     // ─────────────────────────────────────────────
-    renderCalendar();
+    fetchConfirmedBookings().then(() => renderCalendar());
   </script>
 
   <script src="chat-agent.js"></script>
