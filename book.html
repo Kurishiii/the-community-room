@@ -517,6 +517,14 @@
       const collabRadio = form.querySelector('input[name="collab"]:checked');
       const cafeRadio   = form.querySelector('input[name="cafe"]:checked');
 
+      const SETUP_LABELS = {
+        open_mingling: 'Open Mingling',
+        tables_chairs: 'Tables/Chairs',
+        vendor_booths: 'Vendor Booths',
+        stage_area:    'Stage Area',
+        other:         'Other',
+      };
+
       const collabValue = collabRadio && collabRadio.value === 'yes'
         ? ('Yes' + (form.collabType && form.collabType.value ? ' — ' + form.collabType.options[form.collabType.selectedIndex].text : ''))
         : (collabRadio ? 'No' : '');
@@ -527,7 +535,7 @@
         'Phone Number':           form.phone.value.trim(),
         'Event Type':             etype === 'Other' ? (form.otherEvent.value.trim() || 'Other') : etype,
         'Est. Guest Count':       guests,
-        'Setup Type':             setup,
+        'Setup Type':             SETUP_LABELS[setup] || setup,
         'Matcha Cart / Beverage Service Interest': cafeRadio ? (cafeRadio.value === 'yes' ? 'Yes' : 'No') : '',
         'Collaboration Interest': collabValue,
         'Additional Notes':       form.notes.value.trim(),
