@@ -112,7 +112,7 @@
           const category = (f['Category'] || 'community').toLowerCase();
           const name     = f['Event Name'] || '';
           const date     = f['Date and Time'] || '';
-          const flyer    = f['Flyer'] && f['Flyer'][0] ? f['Flyer'][0].url : null;
+          const flyer    = f['Flyer Image'] && f['Flyer Image'][0] ? f['Flyer Image'][0].url : null;
           const label    = f['Category'] || (category.charAt(0).toUpperCase() + category.slice(1));
 
           const flyerHTML = flyer
@@ -143,7 +143,7 @@
     // ── MODAL ──
     function openEvModal(record) {
       const f     = record.fields;
-      const flyer = f['Flyer'] && f['Flyer'][0] ? f['Flyer'][0].url : null;
+      const flyer = f['Flyer Image'] && f['Flyer Image'][0] ? f['Flyer Image'][0].url : null;
       const label = f['Category'] || '';
 
       const flyerHTML = flyer

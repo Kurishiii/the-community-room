@@ -590,7 +590,7 @@
             location: f['Location']      || 'The Community Room Studio',
             detail:   f['Category']      || '',
             desc:     f['Description']   || '',
-            flyer:    f['Flyer'] && f['Flyer'][0] ? f['Flyer'][0].url : null,
+            flyer:    f['Flyer Image'] && f['Flyer Image'][0] ? f['Flyer Image'][0].url : null,
           };
         });
       } catch(e) {
