@@ -319,6 +319,7 @@
     }
 
     function closeModal() {
+      document.activeElement?.blur();
       overlay.classList.remove('bk-overlay-active');
       overlay.setAttribute('aria-hidden', 'true');
       document.body.style.overflow = '';
