@@ -108,18 +108,8 @@
     // ─────────────────────────────────────────────
     const OWNER_EVENTS = {};
 
-    // CLIENT bookings: only "Private event" is ever shown — no details exposed
-    // Slots: 'morning' (8am–12pm), 'afternoon' (12–5pm), 'evening' (5–10pm), 'full_day' (8am–10pm)
-    const CLIENT_BOOKINGS = {
-      '2026-04-04': ['morning'],
-      '2026-04-07': ['morning', 'afternoon'],
-      '2026-04-14': ['full_day'],
-      '2026-04-17': ['evening'],
-      '2026-04-23': ['morning', 'afternoon', 'evening'],
-      '2026-04-28': ['afternoon'],
-      '2026-05-06': ['morning', 'evening'],
-      '2026-05-12': ['full_day'],
-    };
+    // CLIENT bookings: populated from Airtable confirmed bookings on page load
+    const CLIENT_BOOKINGS = {};
 
     // ─────────────────────────────────────────────
     // CONSTANTS
@@ -626,15 +616,16 @@
       try {
         const url = AIRTABLE_BOOKINGS_URL
           + '?filterByFormula=' + encodeURIComponent("{Status}='Confirmed'")
-          + '&fields%5B%5D=Event%20Date';
+          + '&fields%5B%5D=Event%20Date&fields%5B%5D=Some%20Slots%20Open';
         const res = await fetch(url, {
           headers: { 'Authorization': 'Bearer ' + AIRTABLE_TOKEN }
         });
         if (!res.ok) throw new Error('Airtable read failed');
         const json = await res.json();
         json.records.forEach(record => {
-          const date = record.fields['Event Date'];
-          if (date) CLIENT_BOOKINGS[date.slice(0, 10)] = ['full_day'];
+          const date    = record.fields['Event Date'];
+          const partial = record.fields['Some Slots Open'];
+          if (date) CLIENT_BOOKINGS[date.slice(0, 10)] = partial ? ['morning'] : ['full_day'];
         });
       } catch (e) {
         console.warn('Could not load confirmed bookings:', e.message);
