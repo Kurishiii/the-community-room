@@ -555,6 +555,7 @@
           </span>
         </div>
         <p class="bk-event-desc">${ev.desc}</p>
+        ${ev.ticketLink ? `<a href="${ev.ticketLink}" target="_blank" rel="noopener" class="bk-submit" style="display:block;text-align:center;text-decoration:none;margin-bottom:12px;">Get Tickets</a>` : ''}
         <button class="bk-submit bk-submit-outline" onclick="closeModal()">Close</button>`;
 
       overlay.classList.add('bk-overlay-active');
@@ -590,7 +591,8 @@
             location: f['Location']      || 'The Community Room Studio',
             detail:   f['Category']      || '',
             desc:     f['Description']   || '',
-            flyer:    f['Flyer Image'] && f['Flyer Image'][0] ? f['Flyer Image'][0].url : null,
+            flyer:      f['Flyer Image'] && f['Flyer Image'][0] ? f['Flyer Image'][0].url : null,
+            ticketLink: f['Ticket Link'] || null,
           };
         });
       } catch(e) {
