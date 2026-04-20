@@ -106,10 +106,9 @@
     // ─────────────────────────────────────────────
     // DATA — populated from Airtable on page load
     // ─────────────────────────────────────────────
-    const OWNER_EVENTS = {};
-
-    // CLIENT bookings: populated from Airtable confirmed bookings on page load
+    const OWNER_EVENTS   = {};
     const CLIENT_BOOKINGS = {};
+    const TOUR_DATES     = {}; // populated from Airtable Tours table
 
     // ─────────────────────────────────────────────
     // CONSTANTS
@@ -227,8 +226,18 @@
         num.textContent = d;
         cell.appendChild(num);
 
+        const tour = TOUR_DATES[key];
+
         if (!isPast) {
-          if (owner) {
+          if (tour) {
+            // ── Tour ──
+            cell.classList.add('bk-cell-tours');
+            const pill = document.createElement('span');
+            pill.className = 'bk-pill bk-pill-tours';
+            pill.textContent = 'Tour';
+            cell.appendChild(pill);
+
+          } else if (owner) {
             // ── Owner event ──
             cell.classList.add('bk-cell-owner');
             cell.classList.add('bk-cell-clickable');
@@ -635,12 +644,35 @@
     }
 
     // ─────────────────────────────────────────────
+    // AIRTABLE TOURS
+    // ─────────────────────────────────────────────
+
+    async function fetchTours() {
+      try {
+        const url = 'https://api.airtable.com/v0/appooGUL6JfnCssS2/Tours'
+          + '?fields%5B%5D=Date';
+        const res = await fetch(url, {
+          headers: { 'Authorization': 'Bearer ' + AIRTABLE_TOKEN }
+        });
+        if (!res.ok) return;
+        const json = await res.json();
+        json.records.forEach(record => {
+          const date = record.fields['Date'];
+          if (date) TOUR_DATES[date.slice(0, 10)] = true;
+        });
+      } catch (e) {
+        console.warn('Could not load tours:', e.message);
+      }
+    }
+
+    // ─────────────────────────────────────────────
     // INIT
     // ─────────────────────────────────────────────
-    Promise.all([fetchOwnerEvents(), fetchConfirmedBookings()]).then(() => renderCalendar());
+    Promise.all([fetchOwnerEvents(), fetchConfirmedBookings(), fetchTours()]).then(() => renderCalendar());
   </script>
 
   <script src="chat-agent.js"></script>
+  <script src="img-overrides.js"></script>
   <script src="nav.js"></script>
 </body>
 </html>

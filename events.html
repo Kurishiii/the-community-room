@@ -32,13 +32,9 @@
     <p>Community Room — all are welcome.</p>
   </div>
 
-  <!-- FILTER BAR -->
-  <div class="ev-filters">
+  <!-- FILTER BAR — populated dynamically from Airtable categories -->
+  <div class="ev-filters" id="evFilters">
     <button class="ev-filter-btn ev-filter-active" data-filter="all">All</button>
-    <button class="ev-filter-btn" data-filter="music">Music</button>
-    <button class="ev-filter-btn" data-filter="community">Community</button>
-    <button class="ev-filter-btn" data-filter="arts">Arts</button>
-    <button class="ev-filter-btn" data-filter="wellness">Wellness</button>
   </div>
 
   <!-- EVENTS GRID -->
@@ -106,6 +102,33 @@
           grid.innerHTML = '<p style="text-align:center;color:#888;padding:60px 20px;grid-column:1/-1;">No upcoming events at this time. Check back soon!</p>';
           return;
         }
+
+        // Build filter buttons from actual categories in this batch
+        const seenCategories = new Set();
+        records.forEach(record => {
+          const cat = (record.fields['Category'] || 'community').toLowerCase();
+          seenCategories.add(cat);
+        });
+        const filtersEl = document.getElementById('evFilters');
+        filtersEl.innerHTML = '<button class="ev-filter-btn ev-filter-active" data-filter="all">All</button>';
+        seenCategories.forEach(cat => {
+          const btn = document.createElement('button');
+          btn.className = 'ev-filter-btn';
+          btn.dataset.filter = cat;
+          btn.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
+          filtersEl.appendChild(btn);
+        });
+        // Re-bind filter clicks
+        filtersEl.querySelectorAll('.ev-filter-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            filtersEl.querySelectorAll('.ev-filter-btn').forEach(b => b.classList.remove('ev-filter-active'));
+            btn.classList.add('ev-filter-active');
+            const filter = btn.dataset.filter;
+            document.querySelectorAll('.ev-card').forEach(card => {
+              card.style.display = (filter === 'all' || card.dataset.category === filter) ? '' : 'none';
+            });
+          });
+        });
 
         records.forEach(record => {
           const f        = record.fields;
@@ -196,22 +219,12 @@
     overlay.addEventListener('click', e => { if (e.target === overlay) closeEvModal(); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeEvModal(); });
 
-    // ── FILTERS ──
-    document.querySelectorAll('.ev-filter-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.ev-filter-btn').forEach(b => b.classList.remove('ev-filter-active'));
-        btn.classList.add('ev-filter-active');
-        const filter = btn.dataset.filter;
-        document.querySelectorAll('.ev-card').forEach(card => {
-          card.style.display = (filter === 'all' || card.dataset.category === filter) ? '' : 'none';
-        });
-      });
-    });
 
     loadEvents();
   </script>
 
   <script src="chat-agent.js"></script>
+  <script src="img-overrides.js"></script>
   <script src="nav.js"></script>
 </body>
 </html>

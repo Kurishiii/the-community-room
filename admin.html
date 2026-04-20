@@ -16,8 +16,6 @@
       <h2>Admin Access</h2>
       <p>Enter your password to continue</p>
       <input type="password" class="bk-input" id="admPassword" placeholder="Password" />
-      <p style="margin-top:16px;font-size:13px;color:#666;">GitHub Token <span style="font-size:11px;color:#999;">(for cross-device sync)</span></p>
-      <input type="password" class="bk-input" id="admGhToken" placeholder="ghp_…  (paste your token)" autocomplete="off" />
       <div class="adm-gate-error" id="admGateError" hidden>Incorrect password.</div>
       <button class="bk-submit" id="admLoginBtn">Enter</button>
     </div>
@@ -54,6 +52,7 @@
       <div class="adm-tabs">
         <button class="adm-tab adm-tab-active" data-tab="calendar">Calendar Events</button>
         <button class="adm-tab" data-tab="eventspage">Events Page</button>
+        <button class="adm-tab" data-tab="images">Site Images</button>
       </div>
 
       <!-- ── CALENDAR EVENTS TAB ── -->
@@ -153,6 +152,13 @@
         </div>
       </div>
 
+      <!-- ── SITE IMAGES TAB ── -->
+      <div class="adm-panel adm-panel-hidden" id="tab-images">
+        <h3 class="adm-section-title" style="margin-bottom:8px;">Replace Site Images</h3>
+        <p class="adm-list-note" style="margin-bottom:24px;">Upload a new image to replace any photo on the website. Changes apply instantly on this device. Images are stored in your browser.</p>
+        <div class="adm-img-grid" id="imgGrid"></div>
+      </div>
+
     </div>
 
     <footer>
@@ -179,12 +185,10 @@
 
     // ── AUTH ──
     function tryLogin() {
-      const val   = document.getElementById('admPassword').value;
-      const token = document.getElementById('admGhToken').value.trim();
-      const err   = document.getElementById('admGateError');
+      const val = document.getElementById('admPassword').value;
+      const err = document.getElementById('admGateError');
       if (val === ADM_PASSWORD) {
         sessionStorage.setItem('adm_auth', '1');
-        if (token) sessionStorage.setItem('adm_gh_token', token);
         document.getElementById('admGate').style.display = 'none';
         document.getElementById('admContent').style.display = 'block';
         loadAndRender();
@@ -206,7 +210,6 @@
 
     document.getElementById('admLogout').onclick = function() {
       sessionStorage.removeItem('adm_auth');
-      sessionStorage.removeItem('adm_gh_token');
       document.getElementById('admGate').style.display = 'flex';
       document.getElementById('admContent').style.display = 'none';
     };
@@ -363,6 +366,63 @@
       await githubWriteData(data, currentSha);
       renderEvList(data.page_events);
     }
+
+    // ── SITE IMAGES ──
+    const SITE_IMAGES = [
+      { key: 'img_theSPACEphoto',    label: 'The Space Photo',         file: 'theSPACEphoto.png'    },
+      { key: 'img_sweetmondays',     label: 'Sweet Mondays',           file: 'sweetmondays.png'     },
+      { key: 'img_meettheowner',     label: 'Meet the Owner',          file: 'meettheowner.png'     },
+      { key: 'img_makeyourevent',    label: 'Make Your Event',         file: 'makeyourevent.png'    },
+      { key: 'img_includedinrental', label: "What's Included",         file: 'includedinrental.png' },
+      { key: 'img_beveragedropoff',  label: 'Beverage Drop-Off',       file: 'beveragedropoff.jpg'  },
+      { key: 'img_logo',             label: 'Logo',                    file: 'logo.PNG'             },
+    ];
+
+    function renderImgGrid() {
+      const grid = document.getElementById('imgGrid');
+      grid.innerHTML = SITE_IMAGES.map(img => {
+        const stored = localStorage.getItem(img.key);
+        const preview = stored || img.file;
+        return `
+          <div class="adm-img-item">
+            <div class="adm-img-preview-wrap">
+              <img src="${preview}" class="adm-img-preview" alt="${img.label}" />
+            </div>
+            <p class="adm-img-label">${img.label}</p>
+            <label class="adm-img-upload-btn">
+              Replace
+              <input type="file" accept="image/*" style="display:none"
+                onchange="handleImgReplace('${img.key}', this)" />
+            </label>
+            ${stored ? `<button class="adm-delete-btn" style="margin-top:6px;" onclick="resetImg('${img.key}')">Reset to Original</button>` : ''}
+          </div>`;
+      }).join('');
+    }
+
+    function handleImgReplace(key, input) {
+      const file = input.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        localStorage.setItem(key, e.target.result);
+        renderImgGrid();
+        showToast('Image updated! Refresh the page to see the change.');
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function resetImg(key) {
+      localStorage.removeItem(key);
+      renderImgGrid();
+      showToast('Image reset to original.');
+    }
+
+    // Init image tab when clicked
+    document.querySelectorAll('.adm-tab').forEach(tab => {
+      if (tab.dataset.tab === 'images') {
+        tab.addEventListener('click', renderImgGrid);
+      }
+    });
 
     function showToast(msg) {
       const existing = document.getElementById('admToast');
