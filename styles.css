@@ -2114,6 +2114,30 @@ footer {
   border-radius: 0 4px 4px 0;
 }
 
+@media (max-width: 768px) {
+  .meet-owner-section {
+    grid-template-columns: 1fr;
+    gap: 0;
+    padding: 0 0 60px;
+  }
+  .meet-owner-img-wrap {
+    border-radius: 0;
+  }
+  .meet-owner-img {
+    min-height: 320px;
+    max-height: 400px;
+    height: 55vw;
+    object-position: center 20%;
+  }
+  .meet-owner-inner {
+    padding: 36px 24px 0;
+  }
+  .meet-owner-inner h2 {
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+}
+
 /* ── BOOKING FORM RADIO GROUPS ── */
 .bk-radio-group {
   display: flex;
