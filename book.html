@@ -656,7 +656,7 @@
           const f    = record.fields;
           const date = f['Date'];
           if (date) TOUR_DATES[date.slice(0, 10)] = {
-            time:     f['Time']        || '',
+            time:     f['Date and Time'] || '',
             location: f['Location']    || 'The Community Room Studio',
             desc:     f['Description'] || '',
           };
