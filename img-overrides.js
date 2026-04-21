@@ -8,6 +8,11 @@
     'img_includedinrental': 'includedinrental.png',
     'img_beveragedropoff':  'beveragedropoff.jpg',
     'img_logo':             'logo.PNG',
+    'img_collab1':          'collab1.png',
+    'img_collab2':          'collab2.png',
+    'img_collab3':          'collab3.png',
+    'img_collab4':          'collab4.png',
+    'img_collab5':          'collab5.png',
   };
   Object.entries(MAP).forEach(([key, filename]) => {
     const stored = localStorage.getItem(key);
