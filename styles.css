@@ -19,6 +19,7 @@ body {
   color: var(--dark);
   background: var(--white);
   line-height: 1.6;
+  overflow-x: hidden;
 }
 
 /* ── NAV ── */
@@ -779,6 +780,8 @@ footer {
   padding: 14px 20px;
   background: var(--black);
   border-radius: 4px 4px 0 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .bk-month-label {
@@ -808,9 +811,11 @@ footer {
 /* Calendar grid */
 .bk-cal-grid {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   border-left: 1px solid #e8e8e8;
   border-top: 1px solid #e8e8e8;
+  width: 100%;
+  overflow: hidden;
 }
 
 .bk-cal-day-header {
@@ -1338,15 +1343,26 @@ footer {
   .home-split-img-wrap { min-height: 260px; }
   .home-split-text { padding: 36px 24px; }
   .about-split-img { min-height: 300px; }
-  .bk-page { padding: 40px 20px 60px; }
-  .bk-cal-cell { min-height: 70px; padding: 6px; }
-  .bk-day-num { font-size: 12px; }
-  .bk-pill { font-size: 9px; padding: 2px 5px; }
-  .bk-avail-label { font-size: 10px; }
+  .bk-page { padding: 40px 12px 60px; }
+  .bk-cal-cell { min-height: 70px; padding: 6px 4px; }
+  .bk-day-num { font-size: 11px; }
+  .bk-pill { font-size: 8px; padding: 2px 4px; border-radius: 4px; }
+  .bk-pill-soldout { font-size: 7px; padding: 1px 3px; }
+  .bk-avail-label { font-size: 9px; }
+  .bk-cal-day-header { font-size: 9px; padding: 8px 0; letter-spacing: 0; }
+  .bk-cal-nav { padding: 10px 12px; }
   .bk-modal { padding: 28px 20px; }
   .bk-field-row { grid-template-columns: 1fr; }
   .bk-slot-grid { grid-template-columns: repeat(2, 1fr); }
   .bk-catering-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 400px) {
+  .bk-page { padding: 32px 6px 60px; }
+  .bk-cal-cell { min-height: 56px; padding: 4px 2px; }
+  .bk-day-num { font-size: 10px; }
+  .bk-pill { font-size: 7px; padding: 1px 3px; }
+  .bk-cal-day-header { font-size: 8px; }
 }
 
 /* ── HAMBURGER BUTTON (hidden on desktop) ── */
