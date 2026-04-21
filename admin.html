@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin | The Community Room</title>
+  <link rel="icon" type="image/png" href="logo.PNG" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -36,7 +37,7 @@
         <li><a href="cart-services.html">Cart Services</a></li>
         <li><a href="events.html">Events</a></li>
       </ul>
-      <button class="adm-logout-btn" id="admLogout">Log Out</button>
+      <button class="adm-logout-btn" id="admLogout" onclick="doLogout()">Log Out</button>
       <button class="nav-hamburger" id="navHamburger" aria-label="Toggle menu" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
@@ -75,46 +76,6 @@
   <script>
     const ADM_PASSWORD = 'password123';
 
-    // ── AUTH ──
-    function tryLogin() {
-      const val = document.getElementById('admPassword').value;
-      const err = document.getElementById('admGateError');
-      if (val === ADM_PASSWORD) {
-        sessionStorage.setItem('adm_auth', '1');
-        document.getElementById('admGate').style.display = 'none';
-        document.getElementById('admContent').style.display = 'block';
-        renderImgGrid();
-      } else {
-        err.hidden = false;
-      }
-    }
-
-    document.getElementById('admLoginBtn').onclick = tryLogin;
-    document.getElementById('admPassword').onkeydown = function(e) {
-      if (e.key === 'Enter') tryLogin();
-    };
-
-    if (sessionStorage.getItem('adm_auth') === '1') {
-      document.getElementById('admGate').style.display = 'none';
-      document.getElementById('admContent').style.display = 'block';
-      renderImgGrid();
-    }
-
-    document.getElementById('admLogout').onclick = function() {
-      sessionStorage.removeItem('adm_auth');
-      window.location.href = 'index.html';
-    };
-
-    // ── TABS ──
-    document.querySelectorAll('.adm-tab').forEach(tab => {
-      tab.addEventListener('click', () => {
-        document.querySelectorAll('.adm-tab').forEach(t => t.classList.remove('adm-tab-active'));
-        document.querySelectorAll('.adm-panel').forEach(p => p.classList.add('adm-panel-hidden'));
-        tab.classList.add('adm-tab-active');
-        document.getElementById('tab-' + tab.dataset.tab).classList.remove('adm-panel-hidden');
-      });
-    });
-
     // ── SITE IMAGES ──
     const SITE_IMAGES = [
       { key: 'img_theSPACEphoto',    label: 'The Space Photo',         file: 'theSPACEphoto.png'    },
@@ -128,6 +89,7 @@
 
     function renderImgGrid() {
       const grid = document.getElementById('imgGrid');
+      if (!grid) return;
       grid.innerHTML = SITE_IMAGES.map(img => {
         const stored = localStorage.getItem(img.key);
         const preview = stored || img.file;
@@ -147,6 +109,49 @@
       }).join('');
     }
 
+    function showContent() {
+      document.getElementById('admGate').style.display = 'none';
+      document.getElementById('admContent').style.display = 'block';
+      renderImgGrid();
+    }
+
+    // ── AUTH ──
+    function tryLogin() {
+      const val = document.getElementById('admPassword').value;
+      const err = document.getElementById('admGateError');
+      if (val === ADM_PASSWORD) {
+        sessionStorage.setItem('adm_auth', '1');
+        showContent();
+      } else {
+        err.hidden = false;
+      }
+    }
+
+    function doLogout() {
+      sessionStorage.removeItem('adm_auth');
+      window.location.href = 'index.html';
+    }
+
+    document.getElementById('admLoginBtn').addEventListener('click', tryLogin);
+    document.getElementById('admPassword').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') tryLogin();
+    });
+
+    if (sessionStorage.getItem('adm_auth') === '1') {
+      showContent();
+    }
+
+    // ── TABS ──
+    document.querySelectorAll('.adm-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.adm-tab').forEach(t => t.classList.remove('adm-tab-active'));
+        document.querySelectorAll('.adm-panel').forEach(p => p.classList.add('adm-panel-hidden'));
+        tab.classList.add('adm-tab-active');
+        document.getElementById('tab-' + tab.dataset.tab).classList.remove('adm-panel-hidden');
+        if (tab.dataset.tab === 'images') renderImgGrid();
+      });
+    });
+
     function handleImgReplace(key, input) {
       const file = input.files[0];
       if (!file) return;
@@ -164,13 +169,6 @@
       renderImgGrid();
       showToast('Image reset to original.');
     }
-
-    // Init image tab when clicked
-    document.querySelectorAll('.adm-tab').forEach(tab => {
-      if (tab.dataset.tab === 'images') {
-        tab.addEventListener('click', renderImgGrid);
-      }
-    });
 
     function showToast(msg) {
       const existing = document.getElementById('admToast');
