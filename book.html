@@ -244,6 +244,12 @@
             pill.className = 'bk-pill bk-pill-owner';
             pill.textContent = owner.name;
             cell.appendChild(pill);
+            if (owner.soldOut) {
+              const soldOutLabel = document.createElement('span');
+              soldOutLabel.className = 'bk-pill-soldout';
+              soldOutLabel.textContent = 'Sold Out';
+              cell.appendChild(soldOutLabel);
+            }
             cell.addEventListener('click', () => openEventModal(key));
 
           } else if (client) {
