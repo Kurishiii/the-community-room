@@ -31,9 +31,10 @@
       </a>
       <ul class="nav-links" id="navLinks">
         <li><a href="index.html">Home</a></li>
-        <li><a href="events.html">Events</a></li>
+        <li><a href="about.html">About</a></li>
         <li><a href="book.html">Book an Event</a></li>
-        <li><a href="admin.html" class="active">Admin</a></li>
+        <li><a href="cart-services.html">Cart Services</a></li>
+        <li><a href="events.html">Events</a></li>
       </ul>
       <button class="adm-logout-btn" id="admLogout">Log Out</button>
       <button class="nav-hamburger" id="navHamburger" aria-label="Toggle menu" aria-expanded="false">
@@ -71,18 +72,8 @@
 
   </div>
 
-  <script src="github-sync.js"></script>
   <script>
     const ADM_PASSWORD = 'password123';
-
-    const CATEGORY_COLORS = {
-      music:     'linear-gradient(160deg, #1a1a2e 0%, #4a3060 100%)',
-      community: 'linear-gradient(160deg, #2d2d2d 0%, #5a4a3a 100%)',
-      arts:      'linear-gradient(160deg, #1e3a2f 0%, #2d6a4f 100%)',
-      wellness:  'linear-gradient(160deg, #2e1a1a 0%, #7a3b3b 100%)',
-    };
-
-    let currentSha = '';
 
     // ── AUTH ──
     function tryLogin() {
@@ -113,13 +104,6 @@
       sessionStorage.removeItem('adm_auth');
       window.location.href = 'index.html';
     };
-
-    async function loadAndRender() {
-      const { data, sha } = await githubReadData();
-      currentSha = sha;
-      renderCalList(data.calendar_events || {});
-      renderEvList(data.page_events || []);
-    }
 
     // ── TABS ──
     document.querySelectorAll('.adm-tab').forEach(tab => {
