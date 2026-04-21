@@ -146,6 +146,7 @@
     // ── MODAL ──
     function openEvModal(record) {
       const f          = record.fields;
+      console.log('Event fields:', JSON.stringify(f, null, 2));
       const flyer      = f['Flyer Image'] && f['Flyer Image'][0] ? f['Flyer Image'][0].url : null;
       const label      = f['Category'] || '';
       const ticketLink = f['Ticket Link'] || null;
