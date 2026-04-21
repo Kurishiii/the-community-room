@@ -90,7 +90,7 @@
     // ── FETCH & RENDER ──
     async function loadEvents() {
       try {
-        const filter = encodeURIComponent("{Show on Website}=1");
+        const filter = encodeURIComponent("{Show On Website}=1");
         let records = [], offset = '';
         do {
           const url = AIRTABLE_EVENTS_URL + '?filterByFormula=' + filter + (offset ? '&offset=' + offset : '');
@@ -110,12 +110,12 @@
 
         records.forEach(record => {
           const f        = record.fields;
-          const category = (f['Category'] || 'community').toLowerCase();
+          const category = (f['Event Category'] || 'community').toLowerCase();
           const name     = f['Event Name'] || '';
           const date     = f['Date and Time'] || '';
           const flyer      = f['Flyer Image'] && f['Flyer Image'][0] ? f['Flyer Image'][0].url : null;
           const ticketLink = f['Ticket Link'] || null;
-          const label    = f['Category'] || (category.charAt(0).toUpperCase() + category.slice(1));
+          const label    = f['Event Category'] || (category.charAt(0).toUpperCase() + category.slice(1));
 
           const flyerHTML = flyer
             ? `<img src="${flyer}" alt="${name}" style="width:100%;height:100%;object-fit:cover;" />`
@@ -146,9 +146,8 @@
     // ── MODAL ──
     function openEvModal(record) {
       const f          = record.fields;
-      console.log('Event fields:', JSON.stringify(f, null, 2));
       const flyer      = f['Flyer Image'] && f['Flyer Image'][0] ? f['Flyer Image'][0].url : null;
-      const label      = f['Category'] || '';
+      const label      = f['Event Category'] || '';
       const ticketLink = f['Ticket Link'] || null;
 
       const flyerHTML = flyer
@@ -179,7 +178,7 @@
             ${f['Location'] || ''}
           </span>
         </div>
-        <p class="bk-event-desc">${f['Description'] || ''}</p>
+        <p class="bk-event-desc">${f['Event Description'] || ''}</p>
         ${ticketBtn}
         <button class="bk-submit bk-submit-outline" onclick="closeEvModal()">Close</button>`;
 

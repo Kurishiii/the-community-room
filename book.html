@@ -582,7 +582,7 @@
 
     async function fetchOwnerEvents() {
       try {
-        const filter = encodeURIComponent("{Show on Website}=1");
+        const filter = encodeURIComponent("{Show On Website}=1");
         let records = [], offset = '';
         do {
           const url = AIRTABLE_EVENTS_URL + '?filterByFormula=' + filter + (offset ? '&offset=' + offset : '');
@@ -595,19 +595,18 @@
 
         records.forEach(record => {
           const f       = record.fields;
-          console.log('Owner event fields:', JSON.stringify(Object.keys(f)));
           const dateKey = f['Event Date'] ? f['Event Date'].slice(0, 10) : null;
           if (!dateKey) return;
           OWNER_EVENTS[dateKey] = {
-            name:     f['Event Name']    || 'Event',
-            tag:      f['Category']      || 'Event',
-            date:     f['Date and Time'] || '',
-            location: f['Location']      || 'The Community Room Studio',
-            detail:   f['Category']      || '',
-            desc:     f['Description']   || '',
+            name:       f['Event Name']        || 'Event',
+            tag:        f['Event Category']    || 'Event',
+            date:       f['Date and Time']     || '',
+            location:   f['Location']          || 'The Community Room Studio',
+            detail:     f['Event Category']    || '',
+            desc:       f['Event Description'] || '',
             flyer:      f['Flyer Image'] && f['Flyer Image'][0] ? f['Flyer Image'][0].url : null,
-            ticketLink: f['Ticket Link'] || null,
-            soldOut:    f['Sold Out']    || false,
+            ticketLink: f['Ticket Link']       || null,
+            soldOut:    f['Sold Out']          || false,
           };
         });
       } catch(e) {
