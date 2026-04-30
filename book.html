@@ -96,9 +96,9 @@
   </footer>
 
   <script>
-    const AIRTABLE_TOKEN        = 'patsN926w1ViQdlV0.eded10db84d9ffd70597d291a014d616fbb0f9c3803bd4cd19a938158f8d574d';
-    const AIRTABLE_BOOKINGS_URL = 'https://api.airtable.com/v0/appooGUL6JfnCssS2/Booking%20Requests';
-    const AIRTABLE_EVENTS_URL   = 'https://api.airtable.com/v0/appooGUL6JfnCssS2/Events%20%26%20Flyers';
+    const AIRTABLE_TOKEN        = 'patNbETAvcOjyx6LR.4187065f033a6ed6e056f68e0fe98d5c381df27b1ce516f71f2c91b9da1c8531';
+    const AIRTABLE_BOOKINGS_URL = 'https://api.airtable.com/v0/appUNfNKB7WXeeld6/Booking%20Requests';
+    const AIRTABLE_EVENTS_URL   = 'https://api.airtable.com/v0/appUNfNKB7WXeeld6/Events%20%26%20Flyers';
 
     // ─────────────────────────────────────────────
     // DATA — populated from Airtable on page load
@@ -650,7 +650,7 @@
 
     async function fetchTours() {
       try {
-        const res = await fetch('https://api.airtable.com/v0/appooGUL6JfnCssS2/Tours', {
+        const res = await fetch('https://api.airtable.com/v0/appUNfNKB7WXeeld6/Tours', {
           headers: { 'Authorization': 'Bearer ' + AIRTABLE_TOKEN }
         });
         if (!res.ok) return;
