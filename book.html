@@ -40,7 +40,10 @@
       <span class="bk-legend-item">
         <span class="bk-legend-dot bk-dot-available"></span>Available
       </span>
-<span class="bk-legend-item">
+      <span class="bk-legend-item">
+        <span class="bk-legend-dot bk-dot-pending"></span>Limited Availability
+      </span>
+      <span class="bk-legend-item">
         <span class="bk-legend-dot bk-dot-private"></span>Private event
       </span>
       <span class="bk-legend-item">
@@ -103,34 +106,19 @@
     // ─────────────────────────────────────────────
     // DATA — populated from Airtable on page load
     // ─────────────────────────────────────────────
-    const OWNER_EVENTS   = {};
-    const CLIENT_BOOKINGS = {};
-    const TOUR_DATES     = {}; // populated from Airtable Tours table
+    const OWNER_EVENTS    = {};
+    const CLIENT_BOOKINGS = {}; // { 'YYYY-MM-DD': { confirmed: [{start,end,fullDay}], pending: [...] } }
+    const TOUR_DATES      = {};
 
     // ─────────────────────────────────────────────
     // CONSTANTS
     // ─────────────────────────────────────────────
-
-    const ALL_SLOTS = ['morning', 'afternoon', 'evening', 'full_day'];
-
-    const SLOT_INFO = {
-      morning:   { label: 'Morning',   time: '8am – 12pm' },
-      afternoon: { label: 'Afternoon', time: '12pm – 5pm' },
-      evening:   { label: 'Evening',   time: '5pm – 10pm' },
-      full_day:  { label: 'Full Day',  time: '8am – 10pm' },
-    };
-
-    const CATERING_OPTIONS = [
-      { id: 'offsite',      label: 'Off-Site Mobile Cart',         sub: 'We bring the cart to your venue',              popular: false },
-      { id: 'studio_cafe',  label: 'In Studio with Café Cart',     sub: 'Studio rental with full café cart service',    popular: true  },
-      { id: 'studio_only',  label: 'In Studio without Café Cart',  sub: 'Studio rental, no café service',               popular: false },
-    ];
-
-    const CATERING_LABELS = {
-      offsite:     'Off-Site Mobile Cart',
-      studio_cafe: 'In Studio with Café Cart',
-      studio_only: 'In Studio without Café Cart',
-    };
+    const BUFFER_MIN     = 60;
+    const MAX_BOOK_MIN   = 4 * 60;
+    const OPEN_MIN       = 8  * 60; // 8 AM
+    const CLOSE_MIN      = 22 * 60; // 10 PM
+    const FULL_DAY_START = 8  * 60; // 8 AM
+    const FULL_DAY_END   = 20 * 60; // 8 PM
 
     const EVENT_TYPES = [
       'Birthday Party',
@@ -141,6 +129,7 @@
       'Bridal / Baby Shower',
       'Community Gathering',
       'Workshop / Class',
+      'Non-profit',
       'Other',
     ];
 
@@ -153,25 +142,33 @@
     // ─────────────────────────────────────────────
     // HELPERS
     // ─────────────────────────────────────────────
-
     function pad(n) { return String(n).padStart(2, '0'); }
     function toKey(y, m, d) { return `${y}-${pad(m + 1)}-${pad(d)}`; }
 
-    // Returns which slots are still bookable on a given day
-    function getAvailableSlots(key) {
-      const booked = CLIENT_BOOKINGS[key] || [];
-      if (booked.includes('full_day')) return [];
-      const individual = ['morning', 'afternoon', 'evening'];
-      const available = individual.filter(s => !booked.includes(s));
-      // full_day only available if nothing is booked yet
-      if (booked.length === 0) available.push('full_day');
-      return available;
+    function minutesToLabel(m) {
+      const h    = Math.floor(m / 60);
+      const min  = m % 60;
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      const h12  = h === 0 ? 12 : h > 12 ? h - 12 : h;
+      return `${h12}:${pad(min)} ${ampm}`;
+    }
+    function minutesToValue(m) { return `${pad(Math.floor(m / 60))}:${pad(m % 60)}`; }
+    function valueToMinutes(v) { const [h, m] = v.split(':').map(Number); return h * 60 + m; }
+
+    // Returns true if [aS,aE] overlaps [bS,bE] when each side is extended by buf
+    function overlaps(aS, aE, bS, bE, buf = 0) { return aS < bE + buf && aE > bS - buf; }
+
+    function getDayData(key) { return CLIENT_BOOKINGS[key] || { confirmed: [], pending: [] }; }
+
+    function isFullyBlocked(key) {
+      const d = CLIENT_BOOKINGS[key];
+      if (!d) return false;
+      return d.confirmed.some(b => b.fullDay || (b.end - b.start) >= (FULL_DAY_END - FULL_DAY_START));
     }
 
     // ─────────────────────────────────────────────
     // CALENDAR
     // ─────────────────────────────────────────────
-
     const TODAY = new Date();
     TODAY.setHours(0, 0, 0, 0);
 
@@ -179,13 +176,10 @@
     let viewMonth = TODAY.getMonth();
 
     function renderCalendar() {
-      document.getElementById('monthLabel').textContent =
-        `${MONTH_NAMES[viewMonth]} ${viewYear}`;
-
+      document.getElementById('monthLabel').textContent = `${MONTH_NAMES[viewMonth]} ${viewYear}`;
       const grid = document.getElementById('calGrid');
       grid.innerHTML = '';
 
-      // Day-of-week headers
       DAY_NAMES.forEach(d => {
         const h = document.createElement('div');
         h.className = 'bk-cal-day-header';
@@ -196,22 +190,23 @@
       const firstWeekday = new Date(viewYear, viewMonth, 1).getDay();
       const daysInMonth  = new Date(viewYear, viewMonth + 1, 0).getDate();
 
-      // Empty leading cells
       for (let i = 0; i < firstWeekday; i++) {
         const e = document.createElement('div');
         e.className = 'bk-cal-cell bk-cell-empty';
         grid.appendChild(e);
       }
 
-      // Day cells
       for (let d = 1; d <= daysInMonth; d++) {
         const key      = toKey(viewYear, viewMonth, d);
         const cellDate = new Date(viewYear, viewMonth, d);
         const isPast   = cellDate < TODAY;
         const isToday  = cellDate.getTime() === TODAY.getTime();
 
-        const owner  = OWNER_EVENTS[key];
-        const client = CLIENT_BOOKINGS[key];
+        const owner   = OWNER_EVENTS[key];
+        const tour    = TOUR_DATES[key];
+        const dayData = getDayData(key);
+        const blocked    = isFullyBlocked(key);
+        const hasPending = dayData.pending.length > 0;
 
         const cell = document.createElement('div');
         cell.className = 'bk-cal-cell';
@@ -223,13 +218,9 @@
         num.textContent = d;
         cell.appendChild(num);
 
-        const tour = TOUR_DATES[key];
-
         if (!isPast) {
           if (tour) {
-            // ── Tour ──
-            cell.classList.add('bk-cell-tours');
-            cell.classList.add('bk-cell-clickable');
+            cell.classList.add('bk-cell-tours', 'bk-cell-clickable');
             const pill = document.createElement('span');
             pill.className = 'bk-pill bk-pill-tours';
             pill.textContent = 'Tour';
@@ -237,38 +228,41 @@
             cell.addEventListener('click', () => openTourModal(key));
 
           } else if (owner) {
-            // ── Owner event ──
-            cell.classList.add('bk-cell-owner');
-            cell.classList.add('bk-cell-clickable');
+            cell.classList.add('bk-cell-owner', 'bk-cell-clickable');
             const pill = document.createElement('span');
             pill.className = 'bk-pill bk-pill-owner';
             pill.textContent = owner.name;
             cell.appendChild(pill);
             if (owner.soldOut) {
-              const soldOutLabel = document.createElement('span');
-              soldOutLabel.className = 'bk-pill-soldout';
-              soldOutLabel.textContent = 'Sold Out';
-              cell.appendChild(soldOutLabel);
+              const sol = document.createElement('span');
+              sol.className = 'bk-pill-soldout';
+              sol.textContent = 'Sold Out';
+              cell.appendChild(sol);
             }
             cell.addEventListener('click', () => openEventModal(key));
 
-          } else if (client) {
-            // ── Client booking — show as fully blocked Private Event ──
+          } else if (blocked) {
             cell.classList.add('bk-cell-private');
             const pill = document.createElement('span');
             pill.className = 'bk-pill bk-pill-private';
             pill.textContent = 'Private event';
             cell.appendChild(pill);
 
+          } else if (hasPending) {
+            cell.classList.add('bk-cell-pending', 'bk-cell-clickable');
+            const pill = document.createElement('span');
+            pill.className = 'bk-pill bk-pill-pending';
+            pill.textContent = 'Limited Availability';
+            cell.appendChild(pill);
+            cell.addEventListener('click', () => openModal(key, d));
+
           } else {
-            // ── Fully available ──
-            cell.classList.add('bk-cell-available');
-            cell.classList.add('bk-cell-clickable');
+            cell.classList.add('bk-cell-available', 'bk-cell-clickable');
             const avail = document.createElement('span');
             avail.className = 'bk-avail-label';
             avail.textContent = '+ Available';
             cell.appendChild(avail);
-            cell.addEventListener('click', () => openModal(key, d, ALL_SLOTS));
+            cell.addEventListener('click', () => openModal(key, d));
           }
         }
 
@@ -281,7 +275,6 @@
       if (viewMonth < 0) { viewMonth = 11; viewYear--; }
       renderCalendar();
     });
-
     document.getElementById('nextMonth').addEventListener('click', () => {
       viewMonth++;
       if (viewMonth > 11) { viewMonth = 0; viewYear++; }
@@ -291,40 +284,54 @@
     // ─────────────────────────────────────────────
     // MODAL
     // ─────────────────────────────────────────────
-
     const overlay = document.getElementById('overlay');
-    let selectedSlot     = null;
-    let selectedCatering = 'none';
-    let selectedDate     = null;
+    let selectedDate = null;
 
-    function openModal(key, day, availableSlots) {
-      selectedSlot     = null;
-      selectedCatering = 'offsite';
-      selectedDate     = key;
-
+    function openModal(key, day) {
+      selectedDate = key;
       const [y, m] = key.split('-');
-      const title  = `${MONTH_NAMES[parseInt(m, 10) - 1]} ${day}, ${y}`;
+      const title   = `${MONTH_NAMES[parseInt(m, 10) - 1]} ${day}, ${y}`;
+      const dayData = getDayData(key);
 
-      document.getElementById('modalContent').innerHTML = buildForm(title, availableSlots);
+      document.getElementById('modalContent').innerHTML = buildForm(title, dayData);
       overlay.classList.add('bk-overlay-active');
       overlay.removeAttribute('aria-hidden');
       document.body.style.overflow = 'hidden';
 
-      // "Other" event type reveals a description textarea
       const etypeSelect = document.getElementById('etype');
       const otherWrap   = document.getElementById('otherEventWrap');
       etypeSelect.addEventListener('change', () => {
         otherWrap.hidden = etypeSelect.value !== 'Other';
       });
 
-      // Collab yes/no reveals options
       document.querySelectorAll('input[name="collab"]').forEach(radio => {
         radio.addEventListener('change', () => {
           document.getElementById('collabOptionsWrap').hidden = radio.value !== 'yes';
         });
       });
 
-      // Form submit
+      const fullDayCheck   = document.getElementById('fullDay');
+      const timePickerWrap = document.getElementById('timePickerWrap');
+
+      fullDayCheck.addEventListener('change', () => {
+        const on = fullDayCheck.checked;
+        timePickerWrap.style.opacity = on ? '0.4' : '1';
+        document.getElementById('startTime').disabled = on;
+        document.getElementById('endTime').disabled   = on;
+        checkConflict(on ? FULL_DAY_START : null, on ? FULL_DAY_END : null, dayData);
+      });
+
+      document.getElementById('startTime').addEventListener('change', function () {
+        if (this.value) rebuildEndTimes(valueToMinutes(this.value), dayData);
+      });
+
+      document.getElementById('endTime').addEventListener('change', function () {
+        const sEl = document.getElementById('startTime');
+        if (sEl.value && this.value) {
+          checkConflict(valueToMinutes(sEl.value), valueToMinutes(this.value), dayData);
+        }
+      });
+
       document.getElementById('bookingForm').addEventListener('submit', handleSubmit);
     }
 
@@ -340,17 +347,54 @@
     document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
 
     // ─────────────────────────────────────────────
+    // TIME PICKER HELPERS
+    // ─────────────────────────────────────────────
+    function rebuildEndTimes(startMin, dayData) {
+      const endSelect = document.getElementById('endTime');
+      endSelect.innerHTML = '<option value="">Select end time…</option>';
+      const cap = Math.min(startMin + MAX_BOOK_MIN, CLOSE_MIN);
+
+      for (let m = startMin + 30; m <= cap; m += 30) {
+        const blocked = dayData.confirmed.some(b => overlaps(startMin, m, b.start, b.end, BUFFER_MIN));
+        const opt = document.createElement('option');
+        opt.value       = minutesToValue(m);
+        opt.textContent = minutesToLabel(m) + (blocked ? ' (unavailable)' : '');
+        opt.disabled    = blocked;
+        endSelect.appendChild(opt);
+      }
+
+      // Auto-select the latest unblocked option
+      const valid = Array.from(endSelect.options).filter(o => o.value && !o.disabled);
+      if (valid.length) {
+        endSelect.value = valid[valid.length - 1].value;
+        checkConflict(startMin, valueToMinutes(valid[valid.length - 1].value), dayData);
+      }
+    }
+
+    function checkConflict(startMin, endMin, dayData) {
+      const disc = document.getElementById('pendingDisclaimer');
+      if (!disc) return;
+      if (startMin === null || endMin === null) { disc.hidden = true; return; }
+      disc.hidden = !dayData.pending.some(b => overlaps(startMin, endMin, b.start, b.end, BUFFER_MIN));
+    }
+
+    // ─────────────────────────────────────────────
     // FORM BUILDER
     // ─────────────────────────────────────────────
+    function buildForm(title, dayData) {
+      const typeOptions = EVENT_TYPES.map(t => `<option value="${t}">${t}</option>`).join('');
 
-    function buildForm(title, availableSlots) {
-      // Build event type options
-      const typeOptions = EVENT_TYPES.map(t =>
-        `<option value="${t}">${t}</option>`
-      ).join('');
+      let startOptions = '<option value="">Select start time…</option>';
+      for (let m = OPEN_MIN; m <= CLOSE_MIN - 30; m += 30) {
+        const blocked = dayData.confirmed.some(b => m >= b.start - BUFFER_MIN && m < b.end + BUFFER_MIN);
+        startOptions += `<option value="${minutesToValue(m)}" ${blocked ? 'disabled' : ''}>${minutesToLabel(m)}${blocked ? ' (unavailable)' : ''}</option>`;
+      }
+
+      const hasPending = dayData.pending.length > 0;
 
       return `
         <h2 class="bk-modal-title" id="modalTitle">Book for ${title}</h2>
+        ${hasPending ? `<div class="bk-pending-notice">⚠️ Some times on this day have pending requests. You may still book — confirmed requests have priority.</div>` : ''}
         <form id="bookingForm" novalidate>
 
           <div class="bk-field-row">
@@ -390,7 +434,32 @@
             <input class="bk-input" type="number" id="guests" name="guests" min="1" max="500" placeholder="e.g. 30" />
           </div>
 
-          <div class="bk-field">
+          <label style="margin-top: 16px; display: flex; align-items: center; gap: 10px; cursor: pointer;">
+            <input type="checkbox" id="fullDay" name="fullDay" style="width:16px;height:16px;flex-shrink:0;" />
+            <span class="bk-label" style="margin:0;">Rent for full day <span style="color:#888;font-weight:400;">(8 AM – 8 PM)</span></span>
+          </label>
+
+          <div class="bk-field-row" id="timePickerWrap" style="margin-top: 12px;">
+            <div class="bk-field">
+              <label class="bk-label" for="startTime">Start Time <span class="bk-req">*</span></label>
+              <select class="bk-input bk-select" id="startTime" name="startTime">
+                ${startOptions}
+              </select>
+            </div>
+            <div class="bk-field">
+              <label class="bk-label" for="endTime">End Time <span class="bk-req">*</span></label>
+              <select class="bk-input bk-select" id="endTime" name="endTime">
+                <option value="">Select start time first…</option>
+              </select>
+              <span style="font-size:11px;color:#999;margin-top:4px;display:block;">Max 4 hours per booking</span>
+            </div>
+          </div>
+
+          <div id="pendingDisclaimer" class="bk-pending-disclaimer" hidden>
+            ⚠️ This time slot has a pending request. You may still submit, but priority is given to the first requester.
+          </div>
+
+          <div class="bk-field" style="margin-top: 16px;">
             <label class="bk-label" for="setup">What kind of setup do you need? <span class="bk-req">*</span></label>
             <select class="bk-input bk-select" id="setup" name="setup">
               <option value="">Select setup type…</option>
@@ -445,19 +514,22 @@
     // ─────────────────────────────────────────────
     // SUBMIT HANDLER
     // ─────────────────────────────────────────────
-
     async function handleSubmit(e) {
       e.preventDefault();
-      const form   = e.target;
-      const fname  = form.fname.value.trim();
-      const etype  = form.etype.value;
-      const guests = form.guests.value.trim();
-      const setup  = form.setup.value;
+      const form      = e.target;
+      const fname     = form.fname.value.trim();
+      const etype     = form.etype.value;
+      const guests    = form.guests.value.trim();
+      const setup     = form.setup.value;
+      const isFullDay = form.fullDay.checked;
+      const startTime = isFullDay ? '08:00' : form.startTime.value;
+      const endTime   = isFullDay ? '20:00' : form.endTime.value;
 
       const formError = document.getElementById('formError');
       formError.hidden = true;
 
-      if (!fname || !etype || !guests || !setup) {
+      if (!fname || !etype || !guests || !setup || !startTime || !endTime) {
+        formError.textContent = 'Please fill in all required fields marked with *';
         formError.hidden = false;
         return;
       }
@@ -482,35 +554,36 @@
         : (collabRadio ? 'No' : '');
 
       const rawFields = {
-        'Full Name':              fname,
-        'Email':                  form.email.value.trim(),
-        'Phone Number':           form.phone.value.trim(),
-        'Event Type':             etype,
+        'Full Name':               fname,
+        'Email':                   form.email.value.trim(),
+        'Phone Number':            form.phone.value.trim(),
+        'Event Type':              etype,
         'Other Event Description': etype === 'Other' ? form.otherEvent.value.trim() : '',
-        'Est. Guest Count':       guests,
-        'Setup Type':             SETUP_LABELS[setup] || setup,
+        'Est. Guest Count':        Number(guests),
+        'Setup Type':              SETUP_LABELS[setup] || setup,
         'Matcha Cart / Beverage Service Interest': cafeRadio ? (cafeRadio.value === 'yes' ? 'Yes' : 'No') : '',
-        'Collaboration Interest': collabValue,
-        'Additional Notes':       form.notes.value.trim(),
-        'Event Date':             selectedDate || '',
-        'Status':                 'Pending',
+        'Collaboration Interest':  collabValue,
+        'Additional Notes':        form.notes.value.trim(),
+        'Event Date':              selectedDate || '',
+        'Start Time':              startTime,
+        'End Time':                endTime,
+        'Full Day Rental':         isFullDay || undefined,
+        'Status':                  'Pending',
       };
 
-      // Strip empty fields so Airtable doesn't reject them
       const fields = Object.fromEntries(
         Object.entries(rawFields).filter(([, v]) => v !== '' && v !== null && v !== undefined)
       );
 
       try {
         const res = await fetch(AIRTABLE_BOOKINGS_URL, {
-            method: 'POST',
-            headers: {
-              'Authorization': 'Bearer ' + AIRTABLE_TOKEN,
-              'Content-Type':  'application/json',
-            },
-            body: JSON.stringify({ fields }),
-          }
-        );
+          method: 'POST',
+          headers: {
+            'Authorization': 'Bearer ' + AIRTABLE_TOKEN,
+            'Content-Type':  'application/json',
+          },
+          body: JSON.stringify({ fields }),
+        });
 
         if (!res.ok) {
           const err = await res.json();
@@ -538,7 +611,6 @@
     // ─────────────────────────────────────────────
     // OWNER EVENT DETAIL MODAL
     // ─────────────────────────────────────────────
-
     function openEventModal(key) {
       const ev = OWNER_EVENTS[key];
       if (!ev) return;
@@ -578,9 +650,8 @@
     }
 
     // ─────────────────────────────────────────────
-    // AIRTABLE OWNER EVENTS (Events & Flyers table)
+    // AIRTABLE OWNER EVENTS
     // ─────────────────────────────────────────────
-
     async function fetchOwnerEvents() {
       try {
         const filter = encodeURIComponent("{Show On Website}=1");
@@ -616,38 +687,76 @@
     }
 
     // ─────────────────────────────────────────────
-    // AIRTABLE CONFIRMED BOOKINGS
+    // AIRTABLE BOOKINGS — Confirmed + Pending
     // ─────────────────────────────────────────────
 
-    async function fetchConfirmedBookings() {
+    // Parses "HH:MM" (24-hr) or "H:MM AM/PM" into minutes since midnight
+    function parseTimeToMinutes(t) {
+      if (!t) return null;
+      const ampm = t.match(/(\d+):(\d+)\s*(AM|PM)/i);
+      if (ampm) {
+        let h = parseInt(ampm[1], 10);
+        const m = parseInt(ampm[2], 10);
+        const period = ampm[3].toUpperCase();
+        if (period === 'AM' && h === 12) h = 0;
+        if (period === 'PM' && h !== 12) h += 12;
+        return h * 60 + m;
+      }
+      return valueToMinutes(t);
+    }
+
+    async function fetchBookings() {
       try {
-        const url = AIRTABLE_BOOKINGS_URL
-          + '?filterByFormula=' + encodeURIComponent("{Status}='Confirmed'")
-          + '&fields%5B%5D=Event%20Date';
-        const res = await fetch(url, {
-          headers: { 'Authorization': 'Bearer ' + AIRTABLE_TOKEN }
-        });
-        if (!res.ok) {
-          const err = await res.json();
-          console.error('Confirmed bookings fetch error:', err?.error?.message);
-          return;
-        }
-        const json = await res.json();
-        console.log('Confirmed bookings fetched:', json.records.length, 'records');
-        json.records.forEach(record => {
-          const date = record.fields['Event Date'];
-          console.log('Booking record date field:', date);
-          if (date) CLIENT_BOOKINGS[date.slice(0, 10)] = ['full_day'];
+        // Include Confirmed, Pending, and blank-status records; exclude only Cancelled
+        const filter = encodeURIComponent("NOT({Status}='Cancelled')");
+        let records = [], offset = '';
+        do {
+          const url = AIRTABLE_BOOKINGS_URL
+            + '?filterByFormula=' + filter
+            + '&fields[]=Event%20Date&fields[]=Status&fields[]=Start%20Time&fields[]=End%20Time&fields[]=Full%20Day%20Rental'
+            + (offset ? '&offset=' + offset : '');
+          const res = await fetch(url, { headers: { 'Authorization': 'Bearer ' + AIRTABLE_TOKEN } });
+          if (!res.ok) {
+            const err = await res.json();
+            console.error('Bookings fetch error:', err?.error?.message);
+            return;
+          }
+          const json = await res.json();
+          records = records.concat(json.records);
+          offset = json.offset || '';
+        } while (offset);
+
+        records.forEach(record => {
+          const f       = record.fields;
+          const dateKey = f['Event Date'] ? f['Event Date'].slice(0, 10) : null;
+          if (!dateKey) return;
+          if (!CLIENT_BOOKINGS[dateKey]) CLIENT_BOOKINGS[dateKey] = { confirmed: [], pending: [] };
+
+          let startMin, endMin, isFullDay;
+          if (f['Full Day Rental']) {
+            startMin = FULL_DAY_START; endMin = FULL_DAY_END; isFullDay = true;
+          } else if (f['Start Time'] && f['End Time']) {
+            startMin  = parseTimeToMinutes(f['Start Time']);
+            endMin    = parseTimeToMinutes(f['End Time']);
+            isFullDay = false;
+          } else {
+            startMin = FULL_DAY_START; endMin = FULL_DAY_END; isFullDay = true;
+          }
+
+          if (startMin === null || endMin === null) return;
+
+          const status = (f['Status'] || '').toLowerCase();
+          const bucket = status === 'confirmed' ? 'confirmed' : 'pending';
+          CLIENT_BOOKINGS[dateKey][bucket].push({ start: startMin, end: endMin, fullDay: isFullDay });
         });
       } catch (e) {
-        console.warn('Could not load confirmed bookings:', e.message);
+        console.warn('Could not load bookings:', e.message);
       }
     }
 
     // ─────────────────────────────────────────────
     // AIRTABLE TOURS
     // ─────────────────────────────────────────────
-
     async function fetchTours() {
       try {
         const res = await fetch('https://api.airtable.com/v0/appUNfNKB7WXeeld6/Tours', {
@@ -660,8 +769,8 @@
           const date = f['Date'];
           if (date) TOUR_DATES[date.slice(0, 10)] = {
             time:     f['Date and Time'] || '',
-            location: f['Location']    || 'The Community Room Studio',
-            desc:     f['Description'] || '',
+            location: f['Location']      || 'The Community Room Studio',
+            desc:     f['Description']   || '',
           };
         });
       } catch (e) {
@@ -699,7 +808,7 @@
     // ─────────────────────────────────────────────
     // INIT
     // ─────────────────────────────────────────────
-    Promise.all([fetchOwnerEvents(), fetchConfirmedBookings(), fetchTours()]).then(() => renderCalendar());
+    Promise.all([fetchOwnerEvents(), fetchBookings(), fetchTours()]).then(() => renderCalendar());
   </script>
 
   <script src="chat-agent.js"></script>

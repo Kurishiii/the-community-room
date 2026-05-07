@@ -767,9 +767,38 @@ footer {
 }
 .bk-dot-available { background: #22c55e; }
 .bk-dot-partial   { background: #f59e0b; }
+.bk-dot-pending   { background: #f59e0b; }
 .bk-dot-private   { background: #b0b0b0; }
 .bk-dot-owner     { background: var(--purple); }
 .bk-dot-tours     { background: #e03030; }
+
+.bk-cell-pending { background: #fffbeb; }
+.bk-pill-pending {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.bk-pending-notice {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #92400e;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.bk-pending-disclaimer {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #92400e;
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-size: 12px;
+  margin-top: 8px;
+  line-height: 1.5;
+}
 
 /* Calendar wrap — constrain to page width */
 .bk-calendar-wrap {
