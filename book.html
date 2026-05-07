@@ -576,6 +576,7 @@
       );
 
       try {
+        console.log('Sending fields to Airtable:', JSON.stringify(fields, null, 2));
         const res = await fetch(AIRTABLE_BOOKINGS_URL, {
           method: 'POST',
           headers: {
@@ -587,8 +588,7 @@
 
         if (!res.ok) {
           const err = await res.json();
-          console.error('Airtable error type:', err?.error?.type);
-          console.error('Airtable error message:', err?.error?.message);
+          console.error('Airtable full error:', JSON.stringify(err, null, 2));
           throw new Error('Airtable error');
         }
 
