@@ -559,7 +559,7 @@
         'Phone Number':            form.phone.value.trim(),
         'Event Type':              etype,
         'Other Event Description': etype === 'Other' ? form.otherEvent.value.trim() : '',
-        'Est. Guest Count':        parseInt(guests, 10),
+        'Est. Guest Count':        guests,
         'Setup Type':              SETUP_LABELS[setup] || setup,
         'Matcha Cart / Beverage Service Interest': cafeRadio ? (cafeRadio.value === 'yes' ? 'Yes' : 'No') : '',
         'Collaboration Interest':  collabValue,
