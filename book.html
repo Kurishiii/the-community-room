@@ -20,7 +20,6 @@
       <li><a href="about.html">About</a></li>
       <li><a href="book.html" class="active">Book an Event</a></li>
       <li><a href="cart-services.html">Cart Services</a></li>
-      <li><a href="events.html">Events</a></li>
     </ul>
     <button class="nav-hamburger" id="navHamburger" aria-label="Toggle menu" aria-expanded="false">
       <span></span><span></span><span></span>
@@ -101,7 +100,7 @@
   <script>
     const AIRTABLE_TOKEN        = 'patNbETAvcOjyx6LR.4187065f033a6ed6e056f68e0fe98d5c381df27b1ce516f71f2c91b9da1c8531';
     const AIRTABLE_BOOKINGS_URL = 'https://api.airtable.com/v0/appUNfNKB7WXeeld6/Booking%20Requests';
-    const AIRTABLE_EVENTS_URL   = 'https://api.airtable.com/v0/appUNfNKB7WXeeld6/Events%20%26%20Flyers';
+    const AIRTABLE_EVENTS_URL   = 'https://api.airtable.com/v0/appUNfNKB7WXeeld6/Events';
 
     // ─────────────────────────────────────────────
     // DATA — populated from Airtable on page load
@@ -143,6 +142,12 @@
     // HELPERS
     // ─────────────────────────────────────────────
     function pad(n) { return String(n).padStart(2, '0'); }
+    function to12Hour(hhmm) {
+      const [h, m] = hhmm.split(':').map(Number);
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      const h12  = h === 0 ? 12 : h > 12 ? h - 12 : h;
+      return `${h12}:${pad(m)} ${ampm}`;
+    }
     function toKey(y, m, d) { return `${y}-${pad(m + 1)}-${pad(d)}`; }
 
     function minutesToLabel(m) {
@@ -403,14 +408,14 @@
               <input class="bk-input" type="text" id="fname" name="fname" placeholder="Your full name" autocomplete="name" />
             </div>
             <div class="bk-field">
-              <label class="bk-label" for="email">Email</label>
+              <label class="bk-label" for="email">Email <span class="bk-req">*</span></label>
               <input class="bk-input" type="email" id="email" name="email" placeholder="your@email.com" autocomplete="email" />
             </div>
           </div>
 
           <div class="bk-field-row">
             <div class="bk-field">
-              <label class="bk-label" for="phone">Phone Number</label>
+              <label class="bk-label" for="phone">Phone Number <span class="bk-req">*</span></label>
               <input class="bk-input" type="tel" id="phone" name="phone" placeholder="(401) 000-0000" autocomplete="tel" />
             </div>
             <div class="bk-field">
@@ -472,7 +477,7 @@
           </div>
 
           <div class="bk-field" style="margin-top: 16px;">
-            <label class="bk-label">Are you interested in collaboration opportunities or community-based pricing?</label>
+            <label class="bk-label">Are you interested in collaboration opportunities or community-based pricing? <span class="bk-req">*</span></label>
             <div class="bk-radio-group">
               <label class="bk-radio-label"><input type="radio" name="collab" value="yes" /> Yes</label>
               <label class="bk-radio-label"><input type="radio" name="collab" value="no" /> No</label>
@@ -493,7 +498,7 @@
           </div>
 
           <div class="bk-field" style="margin-top: 16px;">
-            <label class="bk-label">Are you interested in adding any café or beverage services (coffee/matcha bar)?</label>
+            <label class="bk-label">Are you interested in adding any café or beverage services (coffee/matcha bar)? <span class="bk-req">*</span></label>
             <div class="bk-radio-group">
               <label class="bk-radio-label"><input type="radio" name="cafe" value="yes" /> Yes</label>
               <label class="bk-radio-label"><input type="radio" name="cafe" value="no" /> No</label>
@@ -521,14 +526,18 @@
       const etype     = form.etype.value;
       const guests    = form.guests.value.trim();
       const setup     = form.setup.value;
+      const email     = form.email.value.trim();
+      const phone     = form.phone.value.trim();
       const isFullDay = form.fullDay.checked;
       const startTime = isFullDay ? '08:00' : form.startTime.value;
       const endTime   = isFullDay ? '20:00' : form.endTime.value;
+      const collabRadio = form.querySelector('input[name="collab"]:checked');
+      const cafeRadio   = form.querySelector('input[name="cafe"]:checked');
 
       const formError = document.getElementById('formError');
       formError.hidden = true;
 
-      if (!fname || !etype || !guests || !setup || !startTime || !endTime) {
+      if (!fname || !email || !phone || !etype || !guests || !setup || !startTime || !endTime || !collabRadio || !cafeRadio) {
         formError.textContent = 'Please fill in all required fields marked with *';
         formError.hidden = false;
         return;
@@ -537,9 +546,6 @@
       const submitBtn = form.querySelector('button[type="submit"]');
       submitBtn.disabled = true;
       submitBtn.textContent = 'Sending…';
-
-      const collabRadio = form.querySelector('input[name="collab"]:checked');
-      const cafeRadio   = form.querySelector('input[name="cafe"]:checked');
 
       const SETUP_LABELS = {
         open_mingling: 'Open Mingling',
@@ -565,8 +571,8 @@
         'Collaboration Interest':  collabValue,
         'Additional Notes':        form.notes.value.trim(),
         'Event Date':              selectedDate || '',
-        'Start Time':              startTime,
-        'End Time':                endTime,
+        'Start Time':              to12Hour(startTime),
+        'End Time':                to12Hour(endTime),
         'Full Day Rental':         isFullDay || undefined,
         'Status':                  'Pending',
       };
