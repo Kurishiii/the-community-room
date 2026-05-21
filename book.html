@@ -111,9 +111,9 @@
     const BUFFER_MIN     = 60;
     const MAX_BOOK_MIN   = 4 * 60;
     const OPEN_MIN       = 8  * 60; // 8 AM
-    const CLOSE_MIN      = 22 * 60; // 10 PM
+    const CLOSE_MIN      = 23 * 60; // 11 PM
     const FULL_DAY_START = 8  * 60; // 8 AM
-    const FULL_DAY_END   = 20 * 60; // 8 PM
+    const FULL_DAY_END   = 23 * 60; // 11 PM
 
     const EVENT_TYPES = [
       'Private Event',
@@ -431,7 +431,7 @@
 
           <label style="margin-top: 16px; display: flex; align-items: center; gap: 10px; cursor: pointer;">
             <input type="checkbox" id="fullDay" name="fullDay" style="width:16px;height:16px;flex-shrink:0;" />
-            <span class="bk-label" style="margin:0;">Rent for full day <span style="color:#888;font-weight:400;">(8 AM – 8 PM)</span></span>
+            <span class="bk-label" style="margin:0;">Rent for full day <span style="color:#888;font-weight:400;">(8 AM – 11 PM)</span></span>
           </label>
 
           <div class="bk-field-row" id="timePickerWrap" style="margin-top: 12px;">
@@ -520,7 +520,7 @@
       const phone     = form.phone.value.trim();
       const isFullDay = form.fullDay.checked;
       const startTime = isFullDay ? '08:00' : form.startTime.value;
-      const endTime   = isFullDay ? '20:00' : form.endTime.value;
+      const endTime   = isFullDay ? '23:00' : form.endTime.value;
       const collabRadio = form.querySelector('input[name="collab"]:checked');
       const cafeRadio   = form.querySelector('input[name="cafe"]:checked');
 
