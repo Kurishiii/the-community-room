@@ -103,7 +103,7 @@
     // ─────────────────────────────────────────────
     const CLIENT_BOOKINGS = {}; // { 'YYYY-MM-DD': { confirmed: [{start,end,fullDay}], pending: [...] } }
 
-    const CLOSED_DAYS = new Set([2, 3]); // Tuesday = 2, Wednesday = 3
+    const CLOSED_DAYS = new Set([1, 2]); // Monday = 1, Tuesday = 2
 
     // ─────────────────────────────────────────────
     // CONSTANTS
@@ -161,9 +161,19 @@
 
     function getDayData(key) { return CLIENT_BOOKINGS[key] || { confirmed: [], pending: [] }; }
 
-    function hasConfirmedBooking(key) {
+    function confirmedCount(key) {
       const d = CLIENT_BOOKINGS[key];
-      return !!(d && d.confirmed.length > 0);
+      return d ? d.confirmed.length : 0;
+    }
+
+    // Returns true if confirmed bookings (plus buffer) leave no bookable slot remaining
+    function isFullyBlocked(key) {
+      const d = CLIENT_BOOKINGS[key];
+      if (!d || d.confirmed.length === 0) return false;
+      for (let m = OPEN_MIN; m <= CLOSE_MIN - 30; m += 30) {
+        if (!d.confirmed.some(b => overlaps(m, m + 30, b.start, b.end, BUFFER_MIN))) return false;
+      }
+      return true;
     }
 
     // ─────────────────────────────────────────────
@@ -202,10 +212,12 @@
         const isPast   = cellDate < TODAY;
         const isToday  = cellDate.getTime() === TODAY.getTime();
 
-        const isClosed   = CLOSED_DAYS.has(cellDate.getDay());
-        const dayData    = getDayData(key);
-        const blocked    = hasConfirmedBooking(key);
-        const hasPending = dayData.pending.length > 0;
+        const isClosed    = CLOSED_DAYS.has(cellDate.getDay());
+        const dayData     = getDayData(key);
+        const fullyBlocked = isFullyBlocked(key);
+        const hasConfirmed = confirmedCount(key) > 0;
+        const hasPending   = dayData.pending.length > 0;
+        const numConfirmed = confirmedCount(key);
 
         const cell = document.createElement('div');
         cell.className = 'bk-cal-cell';
@@ -219,14 +231,14 @@
         cell.appendChild(num);
 
         if (!isPast && !isClosed) {
-          if (blocked) {
+          if (fullyBlocked) {
             cell.classList.add('bk-cell-private');
             const pill = document.createElement('span');
             pill.className = 'bk-pill bk-pill-private';
-            pill.textContent = 'Private event';
+            pill.textContent = numConfirmed > 1 ? 'Private Events' : 'Private event';
             cell.appendChild(pill);
 
-          } else if (hasPending) {
+          } else if (hasConfirmed || hasPending) {
             cell.classList.add('bk-cell-pending', 'bk-cell-clickable');
             const pill = document.createElement('span');
             pill.className = 'bk-pill bk-pill-pending';
